@@ -6,43 +6,49 @@ import { useState } from "react"
 import { toast } from "@/components/ui/use-toast"
 import { FaUserTie, FaUser } from "react-icons/fa"
 
+const roles = [
+  {
+    key: "seller",
+    label: "Seller",
+    icon: <FaUserTie size={40} />,
+    desc: "Create services, receive orders, and earn money from your skills.",
+  },
+  {
+    key: "buyer",
+    label: "Buyer",
+    icon: <FaUser size={40} />,
+    desc: "Find and order services to grow your projects.",
+  },
+]
+
 export default function SelectRole() {
   const { user } = useUser()
   const router = useRouter()
+  const [selected, setSelected] = useState<"seller" | "buyer" | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleRoleSelect = async (isSeller: boolean) => {
+  const handleContinue = async () => {
+    if (!selected || !user) return
     try {
       setIsLoading(true)
-      if (user) {
-        const response = await fetch("http://localhost:8800/api/role/set-role", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            role: isSeller ? "seller" : "buyer"
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error("Cập nhật role thất bại")
-        }
-
-        toast({
-          title: "Thành công",
-          description: `Bạn đã chọn vai trò ${isSeller ? "Người bán" : "Người mua"}`,
-        })
-
-        // Reload lại trang để lấy metadata mới nhất
-        window.location.href = "/"
-      }
-    } catch (error) {
-      console.error("Lỗi khi cập nhật role:", error)
+      const response = await fetch("http://localhost:8800/api/role/set-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          role: selected,
+        }),
+      })
+      if (!response.ok) throw new Error("Failed to update role")
       toast({
-        title: "Lỗi",
-        description: "Không thể cập nhật vai trò. Vui lòng thử lại sau.",
+        title: "Success",
+        description: `You have selected the role: ${selected === "seller" ? "Seller" : "Buyer"}`,
+      })
+      window.location.href = "/"
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not update your role. Please try again later.",
         variant: "destructive",
       })
     } finally {
@@ -51,31 +57,56 @@ export default function SelectRole() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md flex flex-col items-center">
-        <h1 className="text-3xl font-extrabold text-center mb-2 text-gray-900">Chọn vai trò của bạn</h1>
-        <p className="text-gray-500 text-center mb-8">Bạn muốn sử dụng nền tảng này với vai trò nào?</p>
-        <div className="flex flex-col gap-6 w-full">
-          <button
-            onClick={() => handleRoleSelect(true)}
-            disabled={isLoading}
-            className="flex items-center gap-4 w-full py-4 px-4 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition-all text-lg font-semibold justify-center disabled:opacity-50"
-          >
-            <FaUserTie size={28} />
-            Tôi muốn trở thành <span className="font-bold ml-1">Người bán</span>
-          </button>
-          <button
-            onClick={() => handleRoleSelect(false)}
-            disabled={isLoading}
-            className="flex items-center gap-4 w-full py-4 px-4 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition-all text-lg font-semibold justify-center disabled:opacity-50"
-          >
-            <FaUser size={28} />
-            Tôi muốn trở thành <span className="font-bold ml-1">Người mua</span>
-          </button>
+    <div className="min-h-screen flex items-center justify-center bg-[#e9f0fb] px-2">
+      <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-xl flex flex-col items-center relative">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-center mb-2 text-gray-900">Please select your role</h1>
+        <p className="text-gray-500 text-center mb-6 md:mb-8 max-w-md">How do you want to use this platform?</p>
+        <div className="flex gap-6 w-full justify-center mb-8 flex-col md:flex-row">
+          {roles.map((role) => {
+            const isActive = selected === role.key
+            return (
+              <button
+                key={role.key}
+                type="button"
+                onClick={() => setSelected(role.key as "seller" | "buyer")}
+                className={`
+                  flex flex-col items-center px-6 py-8 rounded-xl border-2 shadow-md transition-all
+                  w-full md:w-64 bg-white
+                  ${isActive
+                    ? "border-blue-600 bg-blue-50 scale-105 z-10"
+                    : "border-gray-200 opacity-60 hover:opacity-100 hover:border-blue-400"}
+                  focus:outline-none
+                `}
+                style={{ minHeight: 200 }}
+              >
+                <div className={`mb-3 ${isActive ? "text-blue-600" : "text-gray-400"}`}>{role.icon}</div>
+                <div className={`font-bold text-lg mb-1 ${isActive ? "text-blue-700" : "text-gray-700"}`}>{role.label}</div>
+                <div className="text-gray-500 text-sm text-center">{role.desc}</div>
+              </button>
+            )
+          })}
         </div>
-        {isLoading && (
-          <div className="mt-6 text-blue-600 font-medium animate-pulse">Đang xử lý...</div>
-        )}
+        <button
+          onClick={handleContinue}
+          disabled={!selected || isLoading}
+          className={`
+            w-full md:w-64 py-3 rounded-full bg-blue-600 text-white font-semibold text-lg shadow
+            transition-all hover:bg-blue-700 disabled:opacity-50
+          `}
+        >
+          {isLoading ? "Processing..." : "Continue"}
+        </button>
+        {/* Dots indicator for 2 roles */}
+        <div className="flex gap-2 mt-6">
+          {roles.map((role) => (
+            <span
+              key={role.key}
+              className={`block w-3 h-3 rounded-full transition-all duration-200
+                ${selected === role.key ? "bg-blue-600" : "bg-gray-300"}
+              `}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
