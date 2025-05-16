@@ -1,0 +1,880 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { ArrowLeft, Search, ChevronLeft, ChevronRight, X } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Slider } from "@/components/ui/slider"
+import { Badge } from "@/components/ui/badge"
+import { ServiceCard } from "@/components/service-card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useCurrency } from "@/context/currency-context"
+import { PriceDisplay } from "@/components/price-display"
+
+// Sample data
+const categories = [
+  { id: 1, name: "Graphics & Design", slug: "graphics-design" },
+  { id: 2, name: "Digital Marketing", slug: "digital-marketing" },
+  { id: 3, name: "Writing & Translation", slug: "writing-translation" },
+  { id: 4, name: "Video & Animation", slug: "video-animation" },
+  { id: 5, name: "Music & Audio", slug: "music-audio" },
+  { id: 6, name: "Programming & Tech", slug: "programming-tech" },
+  { id: 7, name: "Business", slug: "business" },
+  { id: 8, name: "Lifestyle", slug: "lifestyle" },
+]
+
+const allServices = [
+  {
+    id: 1,
+    title: "I will design a professional logo for your business",
+    price: 25,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "AlexDesigns",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Level 2 Seller",
+    },
+    rating: 4.9,
+    reviewCount: 156,
+    badges: ["top_rated"],
+    category: "graphics-design",
+    deliveryTime: 1,
+  },
+  {
+    id: 2,
+    title: "I will create a stunning website using WordPress",
+    price: 95,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "WebMaster",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Top Rated",
+    },
+    rating: 5.0,
+    reviewCount: 231,
+    category: "programming-tech",
+    deliveryTime: 3,
+  },
+  {
+    id: 3,
+    title: "I will write SEO-optimized content for your blog",
+    price: 45,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "ContentPro",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Level 1 Seller",
+    },
+    rating: 4.7,
+    reviewCount: 89,
+    category: "writing-translation",
+    deliveryTime: 2,
+  },
+  {
+    id: 4,
+    title: "I will create a professional video intro for your brand",
+    price: 75,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "VideoWizard",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Level 2 Seller",
+    },
+    rating: 4.8,
+    reviewCount: 124,
+    badges: ["new"],
+    category: "video-animation",
+    deliveryTime: 5,
+  },
+  {
+    id: 5,
+    title: "I will design social media graphics for your brand",
+    price: 35,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "SocialDesigner",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Level 1 Seller",
+    },
+    rating: 4.6,
+    reviewCount: 78,
+    category: "graphics-design",
+    deliveryTime: 2,
+  },
+  {
+    id: 6,
+    title: "I will create a custom WordPress theme for your website",
+    price: 120,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "ThemeDeveloper",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Top Rated",
+    },
+    rating: 4.9,
+    reviewCount: 112,
+    badges: ["pro"],
+    category: "programming-tech",
+    deliveryTime: 7,
+  },
+  {
+    id: 7,
+    title: "I will create a digital marketing strategy for your business",
+    price: 150,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "MarketingGuru",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Top Rated",
+    },
+    rating: 4.9,
+    reviewCount: 87,
+    category: "digital-marketing",
+    deliveryTime: 5,
+  },
+  {
+    id: 8,
+    title: "I will translate your content from English to Spanish",
+    price: 30,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "TranslationPro",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "Level 1 Seller",
+    },
+    rating: 4.7,
+    reviewCount: 65,
+    category: "writing-translation",
+    deliveryTime: 3,
+  },
+  {
+    id: 9,
+    title: "I will compose original music for your project",
+    price: 80,
+    image: "/placeholder.svg?height=200&width=300",
+    seller: {
+      name: "MusicMaestro",
+      avatar: "/placeholder.svg?height=40&width=40",
+      level: "New Seller",
+    },
+    rating: 4.5,
+    reviewCount: 23,
+    category: "music-audio",
+    deliveryTime: 4,
+  },
+]
+
+export default function SearchPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { currency, convertPrice, getCurrencySymbol } = useCurrency()
+
+  // Get initial values from URL parameters
+  const initialQuery = searchParams.get("q") || ""
+  const initialCategory = searchParams.get("category") || ""
+  const initialMinPrice = searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 10
+  const initialMaxPrice = searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : 500
+  const initialDeliveryTime = searchParams.get("delivery") ? searchParams.get("delivery")!.split(",").map(Number) : []
+  const initialSellerLevels = searchParams.get("seller") ? searchParams.get("seller")!.split(",") : []
+  const initialSortOption = searchParams.get("sort") || "relevance"
+
+  // State for search and filters
+  const [searchQuery, setSearchQuery] = useState(initialQuery)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
+  const [priceRange, setPriceRange] = useState<[number, number]>([initialMinPrice, initialMaxPrice])
+  const [minPrice, setMinPrice] = useState(initialMinPrice.toString())
+  const [maxPrice, setMaxPrice] = useState(initialMaxPrice.toString())
+  const [deliveryTime, setDeliveryTime] = useState<number[]>(initialDeliveryTime)
+  const [sellerLevels, setSellerLevels] = useState<string[]>(initialSellerLevels)
+  const [sortOption, setSortOption] = useState(initialSortOption)
+  const [filteredResults, setFilteredResults] = useState(allServices)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isClient, setIsClient] = useState(false)
+  const resultsPerPage = 6
+
+  // Giá trị min/max gốc theo USD
+  let minCurrency = Math.round(convertPrice(10))
+  let maxCurrency = Math.round(convertPrice(1000))
+  if (currency === 'VND') {
+    minCurrency = 0
+    maxCurrency = 30_000_000
+  }
+
+  // Set isClient to true once component mounts
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Apply filters and update results
+  useEffect(() => {
+    let results = [...allServices]
+
+    // Filter by search query
+    if (searchQuery) {
+      results = results.filter((service) => service.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      results = results.filter((service) => service.category === selectedCategory)
+    }
+
+    // Filter by price range
+    results = results.filter((service) => {
+      const priceConverted = convertPrice(service.price)
+      return priceConverted >= priceRange[0] && priceConverted <= priceRange[1]
+    })
+
+    // Filter by delivery time
+    if (deliveryTime.length > 0) {
+      results = results.filter((service) => {
+        if (deliveryTime.includes(1) && service.deliveryTime <= 1) return true
+        if (deliveryTime.includes(3) && service.deliveryTime <= 3 && service.deliveryTime > 1) return true
+        if (deliveryTime.includes(7) && service.deliveryTime <= 7 && service.deliveryTime > 3) return true
+        if (deliveryTime.includes(0)) return true // Any time
+        return false
+      })
+    }
+
+    // Filter by seller level
+    if (sellerLevels.length > 0) {
+      results = results.filter((service) => {
+        const level = service.seller.level.toLowerCase()
+        if (sellerLevels.includes("top_rated") && level.includes("top rated")) return true
+        if (sellerLevels.includes("level_2") && level.includes("level 2")) return true
+        if (sellerLevels.includes("level_1") && level.includes("level 1")) return true
+        if (sellerLevels.includes("new_seller") && level.includes("new")) return true
+        return false
+      })
+    }
+
+    // Sort results
+    switch (sortOption) {
+      case "rating":
+        results.sort((a, b) => b.rating - a.rating)
+        break
+      case "price_low":
+        results.sort((a, b) => a.price - b.price)
+        break
+      case "price_high":
+        results.sort((a, b) => b.price - a.price)
+        break
+      case "newest":
+        // In a real app, you'd sort by date
+        // Here we'll just reverse the array as a simple simulation
+        results.reverse()
+        break
+      default:
+        // relevance - keep default order
+        break
+    }
+
+    setFilteredResults(results)
+    setCurrentPage(1) // Reset to first page when filters change
+  }, [searchQuery, selectedCategory, priceRange, deliveryTime, sellerLevels, sortOption])
+
+  // Khi currency thay đổi, cập nhật lại range nếu cần
+  useEffect(() => {
+    setPriceRange([minCurrency, maxCurrency])
+    setMinPrice(minCurrency.toString())
+    setMaxPrice(maxCurrency.toString())
+  }, [currency])
+
+  // Handle search form submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Update URL with search parameters
+    updateSearchParams()
+  }
+
+  // Update URL with all current filters
+  const updateSearchParams = () => {
+    const params = new URLSearchParams()
+    if (searchQuery) params.set("q", searchQuery)
+    if (selectedCategory) params.set("category", selectedCategory)
+    params.set("minPrice", priceRange[0].toString())
+    params.set("maxPrice", priceRange[1].toString())
+    if (deliveryTime.length > 0) params.set("delivery", deliveryTime.join(","))
+    if (sellerLevels.length > 0) params.set("seller", sellerLevels.join(","))
+    params.set("sort", sortOption)
+
+    router.push(`/search?${params.toString()}`)
+  }
+
+  // Handle category checkbox change
+  const handleCategoryChange = (categorySlug: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategory(categorySlug)
+    } else if (selectedCategory === categorySlug) {
+      setSelectedCategory("")
+    }
+  }
+
+  // Handle delivery time checkbox change
+  const handleDeliveryTimeChange = (days: number, checked: boolean) => {
+    if (checked) {
+      setDeliveryTime((prev) => [...prev, days])
+    } else {
+      setDeliveryTime((prev) => prev.filter((d) => d !== days))
+    }
+  }
+
+  // Handle seller level checkbox change
+  const handleSellerLevelChange = (level: string, checked: boolean) => {
+    if (checked) {
+      setSellerLevels((prev) => [...prev, level])
+    } else {
+      setSellerLevels((prev) => prev.filter((l) => l !== level))
+    }
+  }
+
+  // Handle price slider change
+  const handlePriceSliderChange = (values: number[]) => {
+    setPriceRange([values[0], values[1]])
+    setMinPrice(values[0].toString())
+    setMaxPrice(values[1].toString())
+  }
+
+  // Handle min price input change
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setMinPrice(value)
+    if (value && !isNaN(Number(value))) {
+      setPriceRange([Number(value), priceRange[1]])
+    }
+  }
+
+  // Handle max price input change
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setMaxPrice(value)
+    if (value && !isNaN(Number(value))) {
+      setPriceRange([priceRange[0], Number(value)])
+    }
+  }
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery("")
+    setSelectedCategory("")
+    setPriceRange([10, 500])
+    setMinPrice("10")
+    setMaxPrice("500")
+    setDeliveryTime([])
+    setSellerLevels([])
+    setSortOption("relevance")
+
+    // Update URL
+    router.push("/search")
+  }
+
+  // Clear specific filter
+  const clearFilter = (type: string) => {
+    if (type === "search") {
+      setSearchQuery("")
+    } else if (type === "category") {
+      setSelectedCategory("")
+    } else if (type === "price") {
+      setPriceRange([10, 500])
+      setMinPrice("10")
+      setMaxPrice("500")
+    } else if (type === "delivery") {
+      setDeliveryTime([])
+    } else if (type === "seller") {
+      setSellerLevels([])
+    }
+
+    // Update URL with remaining filters
+    setTimeout(updateSearchParams, 0)
+  }
+
+  // Apply filters button click
+  const applyFilters = () => {
+    updateSearchParams()
+  }
+
+  // Pagination
+  const totalPages = Math.ceil(filteredResults.length / resultsPerPage)
+  const paginatedResults = filteredResults.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage)
+
+  // Get currency symbol
+  const currencySymbol = isClient ? getCurrencySymbol() : "$"
+
+  return (
+    <main className="container mx-auto px-4 py-10">
+      <div className="mb-8 flex items-center">
+        <Button variant="ghost" size="sm" className="mr-4" asChild>
+          <Link
+            href="/"
+            className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+        <h1 className="text-3xl font-bold dark:text-white">Search Results</h1>
+      </div>
+
+      {/* Search Bar */}
+      <form onSubmit={handleSearch} className="mb-10 flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input
+            className="pl-10 h-12 border-gray-300 dark:border-gray-700"
+            placeholder="Search for services"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button type="submit" className="h-12 px-6 bg-emerald-500 hover:bg-emerald-600">
+          Search
+        </Button>
+      </form>
+
+      <div className="flex flex-col gap-8 lg:flex-row">
+        {/* Filters Sidebar */}
+        <div className="w-full lg:w-72">
+          <div className="sticky top-20 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-semibold dark:text-white">Filters</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                onClick={clearAllFilters}
+              >
+                Clear All
+              </Button>
+            </div>
+
+            <Accordion
+              type="multiple"
+              defaultValue={["category", "budget", "deliveryTime", "sellerDetails"]}
+              className="space-y-2"
+            >
+              <AccordionItem value="category" className="border-b-0 pt-0">
+                <AccordionTrigger className="py-3 text-base font-medium hover:no-underline dark:text-white">
+                  Category
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="space-y-3">
+                    {categories.map((cat) => (
+                      <div key={cat.id} className="flex items-center space-x-3">
+                        <Checkbox
+                          id={`category-${cat.id}`}
+                          checked={selectedCategory === cat.slug}
+                          onCheckedChange={(checked) => handleCategoryChange(cat.slug, checked as boolean)}
+                        />
+                        <label
+                          htmlFor={`category-${cat.id}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                        >
+                          {cat.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="budget" className="border-b-0">
+                <AccordionTrigger className="py-3 text-base font-medium hover:no-underline dark:text-white">
+                  Budget
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="space-y-5">
+                    <div>
+                      <div className="mb-3 flex justify-between">
+                        <span className="text-sm dark:text-gray-300">
+                          Min: {currencySymbol}{minCurrency}
+                        </span>
+                        <span className="text-sm dark:text-gray-300">
+                          Max: {currencySymbol}{maxCurrency}
+                        </span>
+                      </div>
+                      <Slider
+                        value={priceRange}
+                        min={minCurrency}
+                        max={maxCurrency}
+                        step={currency === 'VND' ? 10000 : 10}
+                        className="my-6"
+                        onValueChange={handlePriceSliderChange}
+                        minStepsBetweenThumbs={1}
+                        defaultValue={[minCurrency, maxCurrency]}
+                      />
+                      <div className="flex items-center justify-between gap-4 mt-4">
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            {currencySymbol}
+                          </span>
+                          <Input
+                            className="pl-7"
+                            type="number"
+                            placeholder="Min"
+                            value={minPrice}
+                            onChange={handleMinPriceChange}
+                          />
+                        </div>
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            {currencySymbol}
+                          </span>
+                          <Input
+                            className="pl-7 min-w-[120px]"
+                            type="number"
+                            placeholder="Max"
+                            value={maxPrice}
+                            onChange={handleMaxPriceChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="deliveryTime" className="border-b-0">
+                <AccordionTrigger className="py-3 text-base font-medium hover:no-underline dark:text-white">
+                  Delivery Time
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="delivery-1"
+                        checked={deliveryTime.includes(1)}
+                        onCheckedChange={(checked) => handleDeliveryTimeChange(1, checked as boolean)}
+                      />
+                      <label
+                        htmlFor="delivery-1"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Up to 1 day
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="delivery-3"
+                        checked={deliveryTime.includes(3)}
+                        onCheckedChange={(checked) => handleDeliveryTimeChange(3, checked as boolean)}
+                      />
+                      <label
+                        htmlFor="delivery-3"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Up to 3 days
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="delivery-7"
+                        checked={deliveryTime.includes(7)}
+                        onCheckedChange={(checked) => handleDeliveryTimeChange(7, checked as boolean)}
+                      />
+                      <label
+                        htmlFor="delivery-7"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Up to 7 days
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="delivery-any"
+                        checked={deliveryTime.includes(0)}
+                        onCheckedChange={(checked) => handleDeliveryTimeChange(0, checked as boolean)}
+                      />
+                      <label
+                        htmlFor="delivery-any"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Any time
+                      </label>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="sellerDetails" className="border-b-0">
+                <AccordionTrigger className="py-3 text-base font-medium hover:no-underline dark:text-white">
+                  Seller Details
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="seller-topRated"
+                        checked={sellerLevels.includes("top_rated")}
+                        onCheckedChange={(checked) => handleSellerLevelChange("top_rated", checked as boolean)}
+                      />
+                      <label
+                        htmlFor="seller-topRated"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Top Rated Seller
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="seller-level2"
+                        checked={sellerLevels.includes("level_2")}
+                        onCheckedChange={(checked) => handleSellerLevelChange("level_2", checked as boolean)}
+                      />
+                      <label
+                        htmlFor="seller-level2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Level 2 Seller
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="seller-level1"
+                        checked={sellerLevels.includes("level_1")}
+                        onCheckedChange={(checked) => handleSellerLevelChange("level_1", checked as boolean)}
+                      />
+                      <label
+                        htmlFor="seller-level1"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        Level 1 Seller
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id="seller-new"
+                        checked={sellerLevels.includes("new_seller")}
+                        onCheckedChange={(checked) => handleSellerLevelChange("new_seller", checked as boolean)}
+                      />
+                      <label
+                        htmlFor="seller-new"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-gray-300"
+                      >
+                        New Seller
+                      </label>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <Button className="mt-6 w-full bg-emerald-500 hover:bg-emerald-600" onClick={applyFilters}>
+              Apply Filters
+            </Button>
+          </div>
+        </div>
+
+        {/* Search Results */}
+        <div className="flex-1">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold dark:text-white">
+                {selectedCategory ? `${getCategoryName(selectedCategory)} Services` : "All Services"}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{filteredResults.length} services available</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm dark:text-gray-300">Sort by:</span>
+              <Select value={sortOption} onValueChange={(value) => setSortOption(value)}>
+                <SelectTrigger className="w-[180px] h-10 border-gray-300 dark:border-gray-700">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="relevance">Best Match</SelectItem>
+                  <SelectItem value="rating">Highest Rating</SelectItem>
+                  <SelectItem value="price_low">Price: Low to High</SelectItem>
+                  <SelectItem value="price_high">Price: High to Low</SelectItem>
+                  <SelectItem value="newest">Newest Arrivals</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Active Filters */}
+          {(searchQuery ||
+            selectedCategory ||
+            priceRange[0] !== 10 ||
+            priceRange[1] !== 500 ||
+            deliveryTime.length > 0 ||
+            sellerLevels.length > 0) && (
+            <div className="mb-6 flex flex-wrap gap-2">
+              {searchQuery && (
+                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                  Search: {searchQuery}
+                  <button
+                    className="ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    onClick={() => clearFilter("search")}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              )}
+              {selectedCategory && (
+                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                  Category: {getCategoryName(selectedCategory)}
+                  <button
+                    className="ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    onClick={() => clearFilter("category")}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              )}
+              {(priceRange[0] !== 10 || priceRange[1] !== 500) && (
+                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                  Price: <PriceDisplay priceUSD={priceRange[0] / (currency === 'VND' ? 24000 : 1)} symbolOnly size="small" /> -{" "}
+                  <PriceDisplay priceUSD={priceRange[1] / (currency === 'VND' ? 24000 : 1)} symbolOnly size="small" />
+                  <button
+                    className="ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    onClick={() => clearFilter("price")}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              )}
+              {deliveryTime.length > 0 && (
+                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                  Delivery: {deliveryTime.includes(0) ? "Any time" : `Up to ${Math.max(...deliveryTime)} days`}
+                  <button
+                    className="ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    onClick={() => clearFilter("delivery")}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              )}
+              {sellerLevels.length > 0 && (
+                <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                  Seller: {sellerLevels.length} selected
+                  <button
+                    className="ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                    onClick={() => clearFilter("seller")}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              )}
+              <Button
+                variant="link"
+                size="sm"
+                className="h-7 px-2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                onClick={clearAllFilters}
+              >
+                Clear All
+              </Button>
+            </div>
+          )}
+
+          {/* Results Grid */}
+          {paginatedResults.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {paginatedResults.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  showCategory={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-800">
+                <Search className="h-6 w-6 text-gray-400" />
+              </div>
+              <h3 className="mb-2 text-lg font-medium dark:text-white">No results found</h3>
+              <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filter criteria</p>
+              <Button variant="outline" className="mt-4" onClick={clearAllFilters}>
+                Clear all filters
+              </Button>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {filteredResults.length > 0 && (
+            <div className="mt-10 flex justify-center">
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  className="h-9 w-9"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  // Show pages around current page
+                  let pageNum = i + 1
+                  if (totalPages > 5) {
+                    if (currentPage > 3) {
+                      pageNum = currentPage - 3 + i
+                    }
+                    if (currentPage > totalPages - 2) {
+                      pageNum = totalPages - 4 + i
+                    }
+                  }
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant="outline"
+                      size="sm"
+                      className={`h-9 w-9 p-0 ${
+                        currentPage === pageNum
+                          ? "bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400"
+                          : ""
+                      }`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                })}
+
+                {totalPages > 5 && currentPage < totalPages - 2 && (
+                  <>
+                    <Button variant="outline" size="sm" className="h-9 w-9 p-0">
+                      ...
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 w-9 p-0"
+                      onClick={() => setCurrentPage(totalPages)}
+                    >
+                      {totalPages}
+                    </Button>
+                  </>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  className="h-9 w-9"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function getCategoryName(slug: string): string {
+  const category = categories.find((cat) => cat.slug === slug)
+  return category ? category.name : slug
+}

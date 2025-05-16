@@ -1,0 +1,31 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "bcrypt": "^5.1.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "jsonwebtoken": "^9.0.0",
+    "nodemon": "^3.1.9",
+    "sequelize": "^6.37.7",
+    "socket.io": "^4.8.1",
+    "stripe": "^11.11.0",
+    "svix": "^1.64.1",
+    "vnpay": "^2.2.0"
+  },
+  "description": "",
+  "devDependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1"
+  }
+}
