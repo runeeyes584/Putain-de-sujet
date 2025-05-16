@@ -6,6 +6,7 @@ import express from "express";
 import http from "http";
 import path from "path";
 import { Server } from "socket.io";
+import { initSocket } from "./controllers/message.controller.js";
 import { sequelize } from "./models/Sequelize-mysql.js";
 import adminLogRoute from "./routes/adminLog.route.js";
 import categoryRoute from "./routes/category.route.js";
@@ -33,7 +34,6 @@ import skillsRoute from "./routes/skills.route.js";
 import userRoute from "./routes/user.route.js";
 import userSearchHistoryRoute from "./routes/userSearchHistory.route.js";
 import messageSocketHandler from "./socket/messageSocket.js";
-import { initSocket } from "./controllers/message.controller.js";
 
 // .env
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
@@ -43,7 +43,7 @@ const clerk = new Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://*.ngrok-free.app"],
+    origin: ["http://localhost:3000", "https://*.ngrok-free.app"],
     credentials: true,
   },
 });
@@ -55,7 +55,7 @@ sequelize.authenticate()
   .then(() => console.log("Đã kết nối MySQL với Sequelize"))
   .catch((err) => console.error("Lỗi kết nối MySQL:", err.message));
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use("/api/users", userRoute);
 

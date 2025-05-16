@@ -1,214 +1,82 @@
 "use client"
 
-import { useEffect } from "react"
+import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { useRole } from "@/contexts/role-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
+import { toast } from "@/components/ui/use-toast"
+import { FaUserTie, FaUser } from "react-icons/fa"
 
-export default function SelectRolePage() {
-  const { role, setRole } = useRole()
+export default function SelectRole() {
+  const { user } = useUser()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-  // Handle role selection
-  const handleSelectRole = (selectedRole: "user" | "admin") => {
-    setRole(selectedRole)
+  const handleRoleSelect = async (isSeller: boolean) => {
+    try {
+      setIsLoading(true)
+      if (user) {
+        const response = await fetch("http://localhost:8800/api/role/set-role", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            role: isSeller ? "seller" : "buyer"
+          }),
+        })
 
-    // Redirect to appropriate dashboard
-    if (selectedRole === "user") {
-      router.push("/dashboard/user")
-    } else {
-      router.push("/dashboard/admin")
+        if (!response.ok) {
+          throw new Error("Cập nhật role thất bại")
+        }
+
+        toast({
+          title: "Thành công",
+          description: `Bạn đã chọn vai trò ${isSeller ? "Người bán" : "Người mua"}`,
+        })
+
+        // Reload lại trang để lấy metadata mới nhất
+        window.location.href = "/"
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật role:", error)
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật vai trò. Vui lòng thử lại sau.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  // If role is already set, redirect to appropriate dashboard
-  useEffect(() => {
-    if (role === "user") {
-      router.push("/dashboard/user")
-    } else if (role === "admin") {
-      router.push("/dashboard/admin")
-    }
-  }, [role, router])
-
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
-      <div className="grid w-full max-w-4xl gap-8 md:grid-cols-2">
-        <Card className="overflow-hidden border-2 transition-all hover:border-emerald-500 hover:shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-            <CardTitle className="text-2xl">User Account</CardTitle>
-            <CardDescription className="text-emerald-100">Access your gigs, orders, and profile</CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="mb-4 flex justify-center">
-              <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-emerald-100">
-                <Image
-                  src="/placeholder.svg?height=128&width=128"
-                  alt="User"
-                  width={128}
-                  height={128}
-                  className="object-cover"
-                />
-              </div>
-            </div>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-emerald-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-emerald-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Browse and purchase gigs</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-emerald-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-emerald-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Manage your orders</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-emerald-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-emerald-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Create and sell your services</span>
-              </li>
-            </ul>
-          </CardContent>
-          <CardFooter className="bg-gray-50 px-6 py-4 dark:bg-gray-800">
-            <Button className="w-full bg-emerald-500 hover:bg-emerald-600" onClick={() => handleSelectRole("user")}>
-              Login as User
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="overflow-hidden border-2 transition-all hover:border-blue-500 hover:shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-            <CardTitle className="text-2xl">Admin Account</CardTitle>
-            <CardDescription className="text-blue-100">Manage platform and oversee operations</CardDescription>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="mb-4 flex justify-center">
-              <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-blue-100">
-                <Image
-                  src="/placeholder.svg?height=128&width=128"
-                  alt="Admin"
-                  width={128}
-                  height={128}
-                  className="object-cover"
-                />
-              </div>
-            </div>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-blue-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-blue-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Manage all users and sellers</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-blue-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-blue-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Review and approve gigs</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="rounded-full bg-blue-100 p-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-blue-600"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                  </svg>
-                </div>
-                <span>Access platform analytics</span>
-              </li>
-            </ul>
-          </CardContent>
-          <CardFooter className="bg-gray-50 px-6 py-4 dark:bg-gray-800">
-            <Button className="w-full bg-blue-500 hover:bg-blue-600" onClick={() => handleSelectRole("admin")}>
-              Login as Admin
-            </Button>
-          </CardFooter>
-        </Card>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md flex flex-col items-center">
+        <h1 className="text-3xl font-extrabold text-center mb-2 text-gray-900">Chọn vai trò của bạn</h1>
+        <p className="text-gray-500 text-center mb-8">Bạn muốn sử dụng nền tảng này với vai trò nào?</p>
+        <div className="flex flex-col gap-6 w-full">
+          <button
+            onClick={() => handleRoleSelect(true)}
+            disabled={isLoading}
+            className="flex items-center gap-4 w-full py-4 px-4 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition-all text-lg font-semibold justify-center disabled:opacity-50"
+          >
+            <FaUserTie size={28} />
+            Tôi muốn trở thành <span className="font-bold ml-1">Người bán</span>
+          </button>
+          <button
+            onClick={() => handleRoleSelect(false)}
+            disabled={isLoading}
+            className="flex items-center gap-4 w-full py-4 px-4 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition-all text-lg font-semibold justify-center disabled:opacity-50"
+          >
+            <FaUser size={28} />
+            Tôi muốn trở thành <span className="font-bold ml-1">Người mua</span>
+          </button>
+        </div>
+        {isLoading && (
+          <div className="mt-6 text-blue-600 font-medium animate-pulse">Đang xử lý...</div>
+        )}
       </div>
     </div>
   )
-}
+} 

@@ -2,29 +2,18 @@
 
 import type React from "react"
 
-import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
+import { BarChart, Bell, Briefcase, Camera, ChevronLeft, ChevronRight, Code, Database, Heart, MessageSquare, Music, Palette, PenTool, Search, ShoppingCart, Smile, Video } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Search, MessageSquare, LogOut, User, Shield, Heart, ShoppingCart, Bell, Palette, BarChart, PenTool, Video, Music, Code, Briefcase, Smile, ChevronLeft, ChevronRight, Database, Camera, Menu, ChevronDown } from "lucide-react"
-import { UserNav } from "@/components/user-nav"
+import { useEffect, useRef, useState } from "react"
 
+import { AuthModal } from "@/components/auth-modal"
+import { LanguageCurrencySwitcher } from "@/components/language-currency-switcher"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MobileNav } from "@/components/mobile-nav"
-import { NotificationsDropdown } from "@/components/notifications-dropdown"
 import { useRole } from "@/contexts/role-context"
-import { Badge } from "@/components/ui/badge"
-import { LanguageCurrencySwitcher } from "@/components/language-currency-switcher"
-import { AuthModal } from "@/components/auth-modal"
 
 export function Navbar() {
   const { role, clearRole } = useRole()
@@ -37,6 +26,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const { isSignedIn } = useUser();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -106,8 +96,8 @@ export function Navbar() {
         <div className="container flex h-16 items-center">
           <div className="mr-4 flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <Image src="/logo.png" alt="Logo" width={60} height={60} />
-              <span className="hidden font-bold sm:inline-block">JobNOVA</span>
+              <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+              <span className="hidden font-bold sm:inline-block">Fiverr Clone</span>
             </Link>
           </div>
 
@@ -147,41 +137,16 @@ export function Navbar() {
                   <ShoppingCart className="h-5 w-5" />
                 </Button>
               </Link>
-              {role ? (
-                <div className="relative group/account">
-                  <button className="flex items-center gap-2 rounded-full border p-2 hover:bg-gray-50 group-hover/account:bg-gray-50 relative after:absolute after:left-0 after:right-0 after:top-full after:h-4 after:content-[''] after:z-0">
-                    <User className="h-5 w-5" />
-                    <span className="hidden md:inline">Tài khoản</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-                  <div className="absolute right-0 top-full mt-2 hidden w-48 rounded-lg border bg-white py-2 shadow-lg group-hover/account:block z-20">
-                    <Link
-                      href="/dashboard/user"
-                      className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/dashboard/user/settings"
-                      className="block px-4 py-2 text-sm hover:bg-gray-50"
-                    >
-                      Cài đặt
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Đăng xuất
-                    </button>
-                  </div>
-                </div>
+              {isSignedIn ? (
+                <UserButton afterSignOutUrl="/" />
               ) : (
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" onClick={handleSignIn}>
-                    Đăng nhập
-                  </Button>
-                  <Button onClick={handleSignUp}>Đăng ký</Button>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost">Đăng nhập</Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button>Đăng ký</Button>
+                  </SignUpButton>
                 </div>
               )}
             </div>

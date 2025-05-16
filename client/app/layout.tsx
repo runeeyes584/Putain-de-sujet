@@ -1,12 +1,14 @@
-import type React from "react"
+import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import type React from "react"
 import "./globals.css"
 
-import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { RoleProvider } from "@/contexts/role-context"
+import { Navbar } from "@/components/navbar"
 import { CurrencyProvider } from "@/context/currency-context"
+import { RoleProvider } from "@/contexts/role-context"
+import { RoleCheck } from "@/components/role-check"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -22,16 +24,19 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
-        <RoleProvider>
-          <CurrencyProvider>
-            <Navbar />
-            {children}
-            <Footer />
-          </CurrencyProvider>
-        </RoleProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={inter.className} suppressHydrationWarning>
+          <RoleProvider>
+            <CurrencyProvider>
+              <RoleCheck />
+              <Navbar />
+                {children}
+              <Footer />
+            </CurrencyProvider>
+          </RoleProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
