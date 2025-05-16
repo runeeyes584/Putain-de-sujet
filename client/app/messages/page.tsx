@@ -1,19 +1,25 @@
 "use client"
 
-import { use, useState, useEffect } from "react"
-import type { ReactNode } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Search, MoreHorizontal, Phone, Video, Info } from "lucide-react"
+import { ArrowLeft, Search } from "lucide-react"
+import io from "socket.io-client"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LiveChat } from "@/components/live-chat"
 
-interface MessagesPageProps {
-  searchParams: Promise<{ order?: string }>
+interface Ticket {
+  order_id: string
+  buyer_clerk_id: string
+  seller_clerk_id: string
+  order_status: string
+  status: string
+  last_message: { message_content: string; sent_at: string }
+  message_count: number
 }
 
 interface Conversation {
@@ -27,34 +33,152 @@ interface Conversation {
   unreadCount: number
   orderId?: string
   orderTitle?: string
-  messages: any[]
 }
 
-export default function MessagesPage({ searchParams }: MessagesPageProps) {
-  const params = use(searchParams)
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
-  const orderId = params?.order || null
+interface Messages {
+  id: string
+  order_id: string
+  sender_clerk_id: string
+  receiver_clerk_id: string
+  message_content: string
+  sent_at: string
+  is_read: boolean
+}
 
-  // Find conversation related to order if order param exists
+// Define the structure of the API response for fetching tickets
+interface TicketsApiResponse {
+  success: boolean
+  tickets?: Ticket[]
+  message?: string // Error message when success is false
+}
+
+export default function MessagesPage({ searchParams }: { searchParams: { order?: string } }) {
+  const searchParamsHook = useSearchParams()
+  const orderId = searchParamsHook.get("order") || null
+  const [tickets, setTickets] = useState<Ticket[]>([])
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+  const [error, setError] = useState("")
+  const { user } = useUser()
+  const senderId = user?.id || ""
+  const socket = io("http://localhost:8800", {
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+    auth: {
+      credentials: "include"
+    }
+  })
+
+  useEffect(() => {
+    if (!senderId) {
+      setError("Người dùng chưa đăng nhập")
+      return
+    }
+
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch(`http://localhost:8800/api/messages/tickets?clerk_id=${senderId}`, {
+          credentials: "include",
+        })
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data: TicketsApiResponse = await response.json()
+        if (data.success) {
+          setTickets(data.tickets || [])
+        } else {
+          setError(data.message || "Không thể tải danh sách ticket")
+        }
+      } catch (err) {
+        setError("Lỗi kết nối mạng hoặc server không phản hồi")
+        console.error("Fetch tickets error:", err)
+      }
+    }
+    fetchTickets()
+
+    socket.on("connect_error", (err: Error) => {
+      console.error("Socket connection error:", err)
+      setError("Không thể kết nối với server chat")
+    })
+
+    socket.on("newMessage", (newMessage: Messages) => {
+      setTickets((prev) =>
+        prev.map((ticket) =>
+          ticket.order_id === newMessage.order_id
+            ? {
+                ...ticket,
+                last_message: { message_content: newMessage.message_content, sent_at: newMessage.sent_at },
+                message_count: ticket.message_count + 1,
+              }
+            : ticket
+        )
+      )
+    })
+
+    return () => {
+      socket.off("newMessage")
+      socket.off("connect_error")
+    }
+  }, [senderId])
+
   useEffect(() => {
     if (orderId) {
-      const orderConversation = conversations.find((conv) => conv.orderId === orderId)
-      if (orderConversation) {
+      const orderTicket = tickets.find((t) => t.order_id === orderId)
+      if (orderTicket) {
         setSelectedConversation({
-          ...orderConversation,
-          messages: orderConversation.messages || [],
-          unreadCount: typeof orderConversation.unreadCount === 'number' ? orderConversation.unreadCount : 0,
+          id: orderTicket.order_id,
+          name: "User",
+          avatar: "/placeholder.svg?height=40&width=40",
+          lastMessage: orderTicket.last_message?.message_content || "",
+          time: orderTicket.last_message?.sent_at || "",
+          online: false,
+          unread: orderTicket.message_count > 0,
+          unreadCount: orderTicket.message_count,
+          orderId: orderTicket.order_id,
+          orderTitle: "Order",
         })
       }
-    } else if (conversations.length > 0 && !selectedConversation) {
-      const firstConv = conversations[0]
+    } else if (tickets.length > 0 && !selectedConversation) {
+      const firstTicket = tickets[0]
       setSelectedConversation({
-        ...firstConv,
-        messages: firstConv.messages || [],
-        unreadCount: typeof firstConv.unreadCount === 'number' ? firstConv.unreadCount : 0,
+        id: firstTicket.order_id,
+        name: "User",
+        avatar: "/placeholder.svg?height=40&width=40",
+        lastMessage: firstTicket.last_message?.message_content || "",
+        time: firstTicket.last_message?.sent_at || "",
+        online: false,
+        unread: firstTicket.message_count > 0,
+        unreadCount: firstTicket.message_count,
+        orderId: firstTicket.order_id,
+        orderTitle: "Order",
       })
     }
-  }, [orderId])
+  }, [orderId, tickets])
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    return isNaN(date.getTime()) ? "" : date.toLocaleTimeString()
+  }
+
+  const conversationItems = useMemo(() => {
+    return tickets.map((ticket) => ({
+      id: ticket.order_id,
+      name: "User",
+      avatar: "/placeholder.svg?height=40&width=40",
+      lastMessage: ticket.last_message?.message_content || "",
+      time: ticket.last_message?.sent_at ? formatDate(ticket.last_message.sent_at) : "",
+      online: false,
+      unread: ticket.message_count > 0,
+      unreadCount: ticket.message_count,
+      orderId: ticket.order_id,
+      orderTitle: "Order",
+    }))
+  }, [tickets])
+
+  const unreadConversations = useMemo(() => {
+    return conversationItems.filter((conv) => conv.unread)
+  }, [conversationItems])
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -68,8 +192,13 @@ export default function MessagesPage({ searchParams }: MessagesPageProps) {
         <h1 className="text-3xl font-bold">Messages</h1>
       </div>
 
+      {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+
+      {!error && tickets.length === 0 && (
+        <div className="text-gray-500 text-sm mb-4">Không có tin nhắn nào để hiển thị.</div>
+      )}
+
       <div className="flex h-[calc(100vh-200px)] flex-col overflow-hidden rounded-lg border bg-white lg:flex-row">
-        {/* Conversations List */}
         <div className="w-full border-r lg:w-80">
           <div className="border-b p-3">
             <div className="relative">
@@ -86,42 +215,24 @@ export default function MessagesPage({ searchParams }: MessagesPageProps) {
             </TabsList>
             <div className="h-[calc(100vh-300px)] overflow-y-auto">
               <TabsContent value="all" className="m-0">
-                {conversations.map((conversation) => (
+                {conversationItems.map((conv) => (
                   <ConversationItem
-                    key={conversation.id}
-                    conversation={{
-                      ...conversation,
-                      messages: conversation.messages || [],
-                      unreadCount: typeof conversation.unreadCount === 'number' ? conversation.unreadCount : 0,
-                    }}
-                    isSelected={selectedConversation?.id === conversation.id}
-                    onClick={() => setSelectedConversation({
-                      ...conversation,
-                      messages: conversation.messages || [],
-                      unreadCount: typeof conversation.unreadCount === 'number' ? conversation.unreadCount : 0,
-                    })}
+                    key={conv.id}
+                    conversation={conv}
+                    isSelected={selectedConversation?.orderId === conv.orderId}
+                    onClick={() => setSelectedConversation(conv)}
                   />
                 ))}
               </TabsContent>
               <TabsContent value="unread" className="m-0">
-                {conversations
-                  .filter((c) => c.unread)
-                  .map((conversation) => (
-                    <ConversationItem
-                      key={conversation.id}
-                      conversation={{
-                        ...conversation,
-                        messages: conversation.messages || [],
-                        unreadCount: typeof conversation.unreadCount === 'number' ? conversation.unreadCount : 0,
-                      }}
-                      isSelected={selectedConversation?.id === conversation.id}
-                      onClick={() => setSelectedConversation({
-                        ...conversation,
-                        messages: conversation.messages || [],
-                        unreadCount: typeof conversation.unreadCount === 'number' ? conversation.unreadCount : 0,
-                      })}
-                    />
-                  ))}
+                {unreadConversations.map((conv) => (
+                  <ConversationItem
+                    key={conv.id}
+                    conversation={conv}
+                    isSelected={selectedConversation?.orderId === conv.orderId}
+                    onClick={() => setSelectedConversation(conv)}
+                  />
+                ))}
               </TabsContent>
               <TabsContent value="archived" className="m-0">
                 <div className="flex h-40 items-center justify-center text-center text-gray-500">
@@ -132,70 +243,13 @@ export default function MessagesPage({ searchParams }: MessagesPageProps) {
           </Tabs>
         </div>
 
-        {/* Chat Area */}
         <div className="flex flex-1 flex-col">
           {selectedConversation ? (
-            <>
-              <div className="flex items-center justify-between border-b p-3">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Image
-                      src={selectedConversation.avatar || "/placeholder.svg"}
-                      alt={selectedConversation.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    {selectedConversation.online && (
-                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{selectedConversation.name}</h3>
-                    <p className="text-xs text-gray-500">{selectedConversation.online ? "Online" : "Offline"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Phone className="h-5 w-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Video className="h-5 w-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Info className="h-5 w-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-
-              {selectedConversation.orderId && (
-                <div className="border-b bg-gray-50 p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-sm font-medium">Order #{selectedConversation.orderId}</span>
-                      <span className="ml-2 text-sm text-gray-500">{selectedConversation.orderTitle}</span>
-                    </div>
-                    <Button variant="outline" size="sm" asChild className="text-xs">
-                      <Link href={`/orders/${selectedConversation.orderId}`}>View Order</Link>
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <LiveChat
-                recipient={{
-                  id: selectedConversation.id,
-                  name: selectedConversation.name,
-                  avatar: selectedConversation.avatar,
-                  online: selectedConversation.online,
-                }}
-                initialMessages={selectedConversation.messages || []}
-                className="flex-1"
-              />
-            </>
+            <Link href={`/messages/${selectedConversation.orderId}`}>
+              <Button variant="outline" className="m-4">
+                View Conversation
+              </Button>
+            </Link>
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <div className="mb-4 rounded-full bg-gray-100 p-6">
@@ -216,7 +270,8 @@ export default function MessagesPage({ searchParams }: MessagesPageProps) {
               </div>
               <h3 className="mb-2 text-xl font-semibold">Your Messages</h3>
               <p className="max-w-md text-gray-500">
-                Select a conversation from the list to start chatting or search for a specific message.
+                Select a conversation from the list to start chatting or search for a specific
+                message.
               </p>
             </div>
           )}
@@ -226,7 +281,7 @@ export default function MessagesPage({ searchParams }: MessagesPageProps) {
   )
 }
 
-function ConversationItem({ conversation, isSelected, onClick }: { conversation: Conversation, isSelected: boolean, onClick: () => void }) {
+function ConversationItem({ conversation, isSelected, onClick }: { conversation: Conversation; isSelected: boolean; onClick: () => void }) {
   return (
     <div
       className={`flex cursor-pointer items-start gap-3 border-b p-3 hover:bg-gray-50 ${
@@ -261,111 +316,14 @@ function ConversationItem({ conversation, isSelected, onClick }: { conversation:
         )}
       </div>
       {conversation.unread && (
-        <Badge className="h-5 w-5 rounded-full bg-emerald-500 p-0 text-center">{conversation.unreadCount}</Badge>
+        <Badge className="h-5 w-5 rounded-full bg-emerald-500 p-0 text-center">
+          {conversation.unreadCount}
+        </Badge>
       )}
     </div>
   )
 }
 
-// Sample data
-const conversations = [
-  {
-    id: "1",
-    name: "John Smith",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "Thanks for your message! I'll get back to you shortly.",
-    time: "10:30 AM",
-    online: true,
-    unread: true,
-    unreadCount: 2,
-    orderId: "ORD-1234",
-    orderTitle: "Professional Logo Design",
-    messages: [
-      {
-        id: "msg-1",
-        text: "Hi there! I'm interested in your logo design service.",
-        sender: "me",
-        time: "10:15 AM",
-        status: "read",
-      },
-      {
-        id: "msg-2",
-        text: "Hello! Thanks for reaching out. I'd be happy to help with your logo design.",
-        sender: "other",
-        time: "10:20 AM",
-        status: "read",
-      },
-      {
-        id: "msg-3",
-        text: "Could you tell me more about your business and what you're looking for in a logo?",
-        sender: "other",
-        time: "10:21 AM",
-        status: "read",
-      },
-      {
-        id: "msg-4",
-        text: "I'm starting a fitness coaching business called 'FitLife'. I want something modern and energetic.",
-        sender: "me",
-        time: "10:25 AM",
-        status: "read",
-      },
-      {
-        id: "msg-5",
-        text: "That sounds great! I can definitely create something that reflects energy and a modern fitness brand.",
-        sender: "other",
-        time: "10:30 AM",
-        status: "read",
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Sarah Johnson",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "I've completed the first draft of your website design.",
-    time: "Yesterday",
-    online: false,
-    unread: true,
-    unreadCount: 1,
-    orderId: "ORD-1235",
-    orderTitle: "Website Development with WordPress",
-  },
-  {
-    id: "3",
-    name: "Michael Chen",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "The blog posts look great! Thank you for your hard work.",
-    time: "Yesterday",
-    online: true,
-    unread: false,
-  },
-  {
-    id: "4",
-    name: "Emily Wilson",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "I've reviewed your video and have some feedback.",
-    time: "May 10",
-    online: false,
-    unread: false,
-    orderId: "ORD-1230",
-    orderTitle: "Professional Video Editing",
-  },
-  {
-    id: "5",
-    name: "David Rodriguez",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "The voice over sounds perfect! Exactly what I needed.",
-    time: "May 8",
-    online: false,
-    unread: false,
-  },
-  {
-    id: "6",
-    name: "Lisa Thompson",
-    avatar: "/placeholder.svg?height=40&width=40",
-    lastMessage: "I understand. Let me know if you change your mind.",
-    time: "May 5",
-    online: false,
-    unread: false,
-  },
-]
+function useUser() {
+  return { user: { id: "user123" } }
+}
