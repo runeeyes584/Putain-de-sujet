@@ -7,42 +7,42 @@ import { Input } from "@/components/ui/input"
 export default function PressPage() {
   const pressReleases = [
     {
-      title: "Fiverr Announces Fourth Quarter and Full Year 2023 Results",
+      title: "JobNOVA Announces Fourth Quarter and Full Year 2023 Results",
       date: "February 21, 2024",
       category: "Financial",
       excerpt:
         "Revenue grew 10% year over year to $91.4 million for the fourth quarter of 2023, and 8% year over year to $351.1 million for the full year 2023.",
     },
     {
-      title: "Fiverr Introduces AI-Powered Tools to Enhance Freelancer Productivity",
+      title: "JobNOVA Introduces AI-Powered Tools to Enhance Freelancer Productivity",
       date: "January 15, 2024",
       category: "Product",
       excerpt:
         "New suite of AI tools helps freelancers create better proposals, manage projects more efficiently, and deliver higher quality work to clients.",
     },
     {
-      title: "Fiverr Expands Business Solutions to Enterprise Clients",
+      title: "JobNOVA Expands Business Solutions to Enterprise Clients",
       date: "December 5, 2023",
       category: "Business",
       excerpt:
-        "Fiverr Business Solutions now offers enterprise-grade services to Fortune 500 companies, providing access to top-tier freelance talent.",
+        "JobNOVA Business Solutions now offers enterprise-grade services to Fortune 500 companies, providing access to top-tier freelance talent.",
     },
     {
-      title: "Fiverr Launches Certified Program for Top-Tier Freelancers",
+      title: "JobNOVA Launches Certified Program for Top-Tier Freelancers",
       date: "November 10, 2023",
       category: "Product",
       excerpt:
         "New certification program recognizes and rewards the platform's most skilled and reliable freelancers with enhanced visibility and benefits.",
     },
     {
-      title: "Fiverr Reports Third Quarter 2023 Financial Results",
+      title: "JobNOVA Reports Third Quarter 2023 Financial Results",
       date: "November 8, 2023",
       category: "Financial",
       excerpt:
         "Revenue increased by 12% year over year to $88.3 million. Active buyers reached 4.2 million, up 2% year over year.",
     },
     {
-      title: "Fiverr Announces Expansion into 5 New Markets",
+      title: "JobNOVA Announces Expansion into 5 New Markets",
       date: "October 3, 2023",
       category: "Business",
       excerpt:
@@ -52,13 +52,13 @@ export default function PressPage() {
 
   const mediaAppearances = [
     {
-      title: "How Fiverr Is Changing The Future Of Work",
+      title: "How JobNOVA Is Changing The Future Of Work",
       publication: "Forbes",
       date: "March 15, 2024",
       image: "/placeholder.svg?height=200&width=300",
     },
     {
-      title: "Fiverr CEO on the Rise of Freelance Economy",
+      title: "JobNOVA CEO on the Rise of Freelance Economy",
       publication: "CNBC",
       date: "February 22, 2024",
       image: "/placeholder.svg?height=200&width=300",
@@ -70,7 +70,7 @@ export default function PressPage() {
       image: "/placeholder.svg?height=200&width=300",
     },
     {
-      title: "Fiverr's Impact on the Global Gig Economy",
+      title: "JobNOVA's Impact on the Global Gig Economy",
       publication: "The Economist",
       date: "December 12, 2023",
       image: "/placeholder.svg?height=200&width=300",
@@ -83,7 +83,7 @@ export default function PressPage() {
       <section className="mb-16 text-center">
         <h1 className="text-4xl font-bold mb-6">Press & News</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          Stay up to date with the latest news, press releases, and media coverage about Fiverr
+          Stay up to date with the latest news, press releases, and media coverage about JobNOVA
         </p>
         <div className="flex justify-center gap-4">
           <Button asChild size="lg">
@@ -102,11 +102,11 @@ export default function PressPage() {
             <h2 className="text-3xl font-bold mb-4">Press Contact</h2>
             <p className="text-lg mb-6">
               For press inquiries, please contact our media relations team. We're happy to provide information, arrange
-              interviews with Fiverr executives, or assist with any other media needs.
+              interviews with JobNOVA executives, or assist with any other media needs.
             </p>
             <div className="space-y-2">
               <p>
-                <strong>Email:</strong> press@fiverr.com
+                <strong>Email:</strong> press@jobnova.com
               </p>
               <p>
                 <strong>Phone:</strong> +1 (555) 123-4567
@@ -250,13 +250,13 @@ export default function PressPage() {
               images, and more resources for press and media professionals.
             </p>
             <Button size="lg" asChild>
-              <Link href="/downloads/fiverr-media-kit.zip">Download Media Kit</Link>
+              <Link href="/downloads/jobnova-media-kit.zip">Download Media Kit</Link>
             </Button>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted rounded-lg p-4 text-center">
-              <img src="/placeholder.svg?height=100&width=200" alt="Fiverr logo" className="mx-auto mb-2" />
-              <p className="text-sm font-medium">Fiverr Logos</p>
+              <img src="/placeholder.svg?height=100&width=200" alt="JobNOVA logo" className="mx-auto mb-2" />
+              <p className="text-sm font-medium">JobNOVA Logos</p>
             </div>
             <div className="bg-muted rounded-lg p-4 text-center">
               <img src="/placeholder.svg?height=100&width=200" alt="Brand guidelines" className="mx-auto mb-2" />
@@ -279,28 +279,28 @@ export default function PressPage() {
         <h2 className="text-3xl font-bold mb-8 text-center">Company Facts</h2>
         <div className="grid md:grid-cols-2 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">About Fiverr</h3>
+            <h3 className="text-xl font-bold mb-4">About JobNOVA</h3>
             <p className="mb-4">
-              Fiverr's mission is to change how the world works together. The Fiverr platform connects businesses with
+              JobNOVA's mission is to change how the world works together. The JobNOVA platform connects businesses with
               freelancers offering digital services in more than 500 categories across 9 verticals including graphic
               design, digital marketing, programming, video, and animation.
             </p>
             <ul className="space-y-2">
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 mr-2"></div>
-                <span>Founded in 2010 by Micha Kaufman and Shai Wininger</span>
+                <span>Founded in 2023 by Lê Anh Tiến, Dương Phúc Khang, Nguyễn Hùng Sơn</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 mr-2"></div>
-                <span>Headquartered in New York with offices worldwide</span>
+                <span>Headquartered in Hanoi, Vietnam with offices worldwide</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 mr-2"></div>
-                <span>Publicly traded on the NYSE (FVRR) since 2019</span>
+                <span>Publicly traded on the NYSE (FVRR) since 2024</span>
               </li>
               <li className="flex items-start">
                 <div className="w-2 h-2 rounded-full bg-primary mt-2 mr-2"></div>
-                <span>Over 4 million active buyers from more than 160 countries</span>
+                <span>Over 1 million active buyers from more than 16 countries</span>
               </li>
             </ul>
           </div>
@@ -308,29 +308,29 @@ export default function PressPage() {
             <h3 className="text-xl font-bold mb-4">Key Milestones</h3>
             <div className="space-y-4">
               <div className="flex">
-                <div className="mr-4 text-right w-16 font-bold">2010</div>
-                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">Fiverr founded in Tel Aviv, Israel</div>
-              </div>
-              <div className="flex">
-                <div className="mr-4 text-right w-16 font-bold">2015</div>
-                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
-                  Introduced Fiverr Pro, offering curated professional services
-                </div>
-              </div>
-              <div className="flex">
-                <div className="mr-4 text-right w-16 font-bold">2019</div>
-                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
-                  Initial public offering on the New York Stock Exchange
-                </div>
-              </div>
-              <div className="flex">
-                <div className="mr-4 text-right w-16 font-bold">2020</div>
-                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
-                  Launched Fiverr Business for team collaboration
-                </div>
+                <div className="mr-4 text-right w-16 font-bold">2023</div>
+                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">JobNOVA founded in Ho Chi Minh city, Viet Nam</div>
               </div>
               <div className="flex">
                 <div className="mr-4 text-right w-16 font-bold">2023</div>
+                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
+                  Introduced JobNOVA Pro, offering curated professional services
+                </div>
+              </div>
+              <div className="flex">
+                <div className="mr-4 text-right w-16 font-bold">2024</div>
+                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
+                  Initial public offering on the HaNoi Stock Exchange
+                </div>
+              </div>
+              <div className="flex">
+                <div className="mr-4 text-right w-16 font-bold">2025</div>
+                <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
+                  Launched JobNOVA Business for team collaboration
+                </div>
+              </div>
+              <div className="flex">
+                <div className="mr-4 text-right w-16 font-bold">2025</div>
                 <div className="flex-1 pb-4 border-l-2 border-primary pl-4">
                   Introduced AI-powered tools for freelancers and buyers
                 </div>
@@ -344,7 +344,7 @@ export default function PressPage() {
       <section className="text-center bg-primary text-primary-foreground rounded-xl p-12">
         <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
-          Subscribe to our press release mailing list to receive the latest news and updates from Fiverr.
+          Subscribe to our press release mailing list to receive the latest news and updates from JobNOVA.
         </p>
         <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-4">
           <Input placeholder="Enter your email" className="bg-white text-black placeholder:text-gray-500" />

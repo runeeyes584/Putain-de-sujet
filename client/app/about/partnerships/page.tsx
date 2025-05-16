@@ -9,79 +9,79 @@ export default function PartnershipsPage() {
   const partnerTypes = [
     {
       title: "Technology Partners",
-      description: "Integrate your technology with Fiverr to enhance the freelancer and buyer experience.",
+      description: "Integrate your technology with JobNOVA to enhance the freelancer and buyer experience.",
       benefits: [
         "API access for seamless integration",
         "Co-marketing opportunities",
         "Joint product development",
-        "Access to Fiverr's global user base",
+        "Access to JobNOVA's global user base",
       ],
-      icon: "/placeholder.svg?height=80&width=80",
+      icon: "/logo.png?height=80&width=80",
     },
     {
       title: "Agency Partners",
-      description: "Expand your service offerings by accessing Fiverr's network of skilled freelancers.",
+      description: "Expand your service offerings by accessing JobNOVA's network of skilled freelancers.",
       benefits: [
         "White-label solutions",
         "Dedicated account management",
         "Priority access to top talent",
         "Custom workflow solutions",
       ],
-      icon: "/placeholder.svg?height=80&width=80",
+      icon: "/logo.png?height=80&width=80",
     },
     {
       title: "Educational Partners",
-      description: "Collaborate with Fiverr to provide educational resources and career opportunities.",
+      description: "Collaborate with JobNOVA to provide educational resources and career opportunities.",
       benefits: [
         "Co-branded learning materials",
         "Student discounts and programs",
         "Career pathway development",
         "Certification opportunities",
       ],
-      icon: "/placeholder.svg?height=80&width=80",
+      icon: "/logo.png?height=80&width=80",
     },
     {
       title: "Affiliate Partners",
-      description: "Earn commissions by referring new users to Fiverr's marketplace.",
+      description: "Earn commissions by referring new users to JobNOVA's marketplace.",
       benefits: [
         "Competitive commission structure",
         "Marketing materials and support",
         "Real-time performance tracking",
         "Regular payment schedule",
       ],
-      icon: "/placeholder.svg?height=80&width=80",
+      icon: "/logo.png?height=80&width=80",
     },
   ]
 
   const featuredPartners = [
     {
       name: "Adobe",
-      logo: "/placeholder.svg?height=60&width=120",
-      description: "Integrating creative tools directly into the Fiverr platform.",
+      logo: "/icon/adobe.png?height=60&width=120",
+      description: "Integrating creative tools directly into the JobNOVA platform.",
     },
     {
       name: "Wix",
-      logo: "/placeholder.svg?height=60&width=120",
-      description: "Connecting website builders with Fiverr designers and developers.",
+      logo: "/icon/wix.png?height=60&width=120",
+      description: "Connecting website builders with JobNOVA designers and developers.",
     },
     {
       name: "Canva",
-      logo: "/placeholder.svg?height=60&width=120",
+      logo: "/icon/canva.png?height=60&width=120",
       description: "Empowering freelancers with professional design capabilities.",
     },
     {
       name: "HubSpot",
-      logo: "/placeholder.svg?height=60&width=120",
+      logo: "/icon/hubspot.png?height=60&width=120",
       description: "Streamlining marketing services for businesses of all sizes.",
     },
     {
       name: "Shopify",
-      logo: "/placeholder.svg?height=60&width=120",
+      logo: "/icon/shopify.png?height=60&width=120",
       description: "Helping e-commerce businesses find specialized talent.",
     },
     {
       name: "Zoom",
-      logo: "/placeholder.svg?height=60&width=120",
+      logo: "/icon/zoom.png?height=60&width=120",
       description: "Facilitating seamless communication between buyers and sellers.",
     },
   ]
@@ -89,28 +89,28 @@ export default function PartnershipsPage() {
   const successStories = [
     {
       partner: "TechCorp",
-      logo: "/placeholder.svg?height=80&width=80",
-      title: "Scaling Design Operations with Fiverr Enterprise",
+      logo: "/icon/tech.png?height=80&width=80",
+      title: "Scaling Design Operations with JobNOVA Enterprise",
       quote:
-        "Our partnership with Fiverr has allowed us to scale our design operations efficiently, accessing specialized talent when we need it most.",
+        "Our partnership with JobNOVA has allowed us to scale our design operations efficiently, accessing specialized talent when we need it most.",
       person: "Sarah Johnson, VP of Design at TechCorp",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/icon/?height=300&width=400",
     },
     {
       partner: "EduLearn",
-      logo: "/placeholder.svg?height=80&width=80",
+      logo: "/icon/edu.png?height=80&width=80",
       title: "Creating Career Pathways for Students",
       quote:
-        "By partnering with Fiverr, we've created real-world opportunities for our students to gain experience and build their portfolios.",
+        "By partnering with JobNOVA, we've created real-world opportunities for our students to gain experience and build their portfolios.",
       person: "Michael Chen, Director at EduLearn",
       image: "/placeholder.svg?height=300&width=400",
     },
     {
       partner: "MarketPro",
-      logo: "/placeholder.svg?height=80&width=80",
+      logo: "/icon/market.png?height=80&width=80",
       title: "Expanding Service Offerings Through Partnership",
       quote:
-        "Our agency has been able to take on more diverse projects by leveraging Fiverr's talent pool, increasing our revenue by 35%.",
+        "Our agency has been able to take on more diverse projects by leveraging JobNOVA's talent pool, increasing our revenue by 35%.",
       person: "Jessica Williams, CEO of MarketPro",
       image: "/placeholder.svg?height=300&width=400",
     },
@@ -120,7 +120,7 @@ export default function PartnershipsPage() {
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <section className="mb-16 text-center">
-        <h1 className="text-4xl font-bold mb-6">Partner with Fiverr</h1>
+        <h1 className="text-4xl font-bold mb-6">Partner with JobNOVA</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Join forces with the world's largest marketplace for digital services and create new opportunities for growth
         </p>
@@ -139,7 +139,7 @@ export default function PartnershipsPage() {
         <div>
           <h2 className="text-3xl font-bold mb-4">Why Partner With Us?</h2>
           <p className="text-lg mb-6">
-            Partnering with Fiverr opens doors to a global community of freelancers and businesses. Together, we can
+            Partnering with JobNOVA opens doors to a global community of freelancers and businesses. Together, we can
             create innovative solutions, expand market reach, and drive mutual growth.
           </p>
           <div className="space-y-4">
@@ -159,7 +159,7 @@ export default function PartnershipsPage() {
         </div>
         <div className="rounded-lg overflow-hidden">
           <img
-            src="/placeholder.svg?height=400&width=600"
+            src="/banner/banner-partner.jpg?height=400&width=600"
             alt="Partnership benefits"
             className="w-full h-auto object-cover"
           />
@@ -273,7 +273,7 @@ export default function PartnershipsPage() {
           <div>
             <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
             <p className="text-lg mb-6">
-              Interested in exploring partnership opportunities with Fiverr? Fill out the form and our partnerships team
+              Interested in exploring partnership opportunities with JobNOVA? Fill out the form and our partnerships team
               will get in touch with you to discuss potential collaboration.
             </p>
             <div className="space-y-4">
@@ -394,9 +394,9 @@ export default function PartnershipsPage() {
         <div className="grid md:grid-cols-2 gap-6">
           {[
             {
-              question: "What types of partnerships does Fiverr offer?",
+              question: "What types of partnerships does JobNOVA offer?",
               answer:
-                "Fiverr offers various partnership types including technology integrations, agency partnerships, educational collaborations, and affiliate programs. Each type is designed to create mutual value and growth opportunities.",
+                "JobNOVA offers various partnership types including technology integrations, agency partnerships, educational collaborations, and affiliate programs. Each type is designed to create mutual value and gro",
             },
             {
               question: "How long does the partnership process take?",
@@ -404,17 +404,17 @@ export default function PartnershipsPage() {
                 "The timeline varies depending on the partnership type and complexity. Simple integrations may take a few weeks, while more complex partnerships could take several months to develop and implement.",
             },
             {
-              question: "Is there a cost associated with becoming a Fiverr partner?",
+              question: "Is there a cost associated with becoming a JobNOVA partner?",
               answer:
                 "Partnership costs vary based on the type and scope. Some partnerships like our affiliate program have no upfront costs, while others may involve investment from both parties. Details are discussed during the consultation phase.",
             },
             {
-              question: "Can small businesses or startups become Fiverr partners?",
+              question: "Can small businesses or startups become JobNOVA partners?",
               answer:
                 "We partner with organizations of all sizes. We evaluate partnerships based on strategic alignment, innovation potential, and mutual value creation rather than company size.",
             },
             {
-              question: "What support does Fiverr provide to partners?",
+              question: "What support does JobNOVA provide to partners?",
               answer:
                 "Partners receive dedicated support from our partnerships team, access to relevant APIs and resources, co-marketing opportunities, and regular performance reviews to ensure the partnership's success.",
             },
@@ -438,7 +438,7 @@ export default function PartnershipsPage() {
       <section className="text-center bg-primary text-primary-foreground rounded-xl p-12">
         <h2 className="text-3xl font-bold mb-4">Ready to Explore Partnership Opportunities?</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto">
-          Join the Fiverr ecosystem and create new possibilities for your business and our global community.
+          Join the JobNOVA ecosystem and create new possibilities for your business and our global community.
         </p>
         <Button variant="secondary" size="lg" asChild>
           <Link href="#become-partner">Get Started Today</Link>

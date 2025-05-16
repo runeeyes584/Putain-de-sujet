@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="container mx-auto px-4 py-12">
@@ -47,7 +48,7 @@ export default function PrivacyPolicyPage() {
         <section id="introduction">
           <h2 className="text-2xl font-bold mb-4">1. Introduction</h2>
           <p className="mb-4">
-            Fiverr.com, including its subdomains, and all related sites, applications, services and tools (collectively, the "Site") is operated by Fiverr International Ltd. and its affiliated companies (collectively, "Fiverr", "we", "us" and/or "our").
+            JobNOVA.com, including its subdomains, and all related sites, applications, services and tools (collectively, the "Site") is operated by JobNOVA International Ltd. and its affiliated companies (collectively, "JobNOVA", "we", "us" and/or "our").
           </p>
           <p className="mb-4">
             This Privacy Policy describes how we collect, use, share and protect the personal information that we gather from you when you use the Site. By using the Site, you agree to the terms of this Privacy Policy and our Terms of Service.

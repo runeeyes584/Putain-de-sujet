@@ -77,7 +77,7 @@ export default function CareersPage() {
       <section className="mb-16 text-center">
         <h1 className="text-4xl font-bold mb-6">Join Our Team</h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          Help us change how the world works together. Explore opportunities to grow your career at Fiverr.
+          Help us change how the world works together. Explore opportunities to grow your career at JobNOVA.
         </p>
         <div className="relative max-w-xl mx-auto">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
@@ -85,19 +85,19 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Why Fiverr Section */}
+      {/* Why JobNOVA Section */}
       <section className="mb-16 grid md:grid-cols-2 gap-12 items-center">
         <div className="rounded-lg overflow-hidden">
           <img
-            src="/placeholder.svg?height=400&width=600"
-            alt="Fiverr office culture"
+            src="/banner/banner-career.jpg?height=400&width=600"
+            alt="JobNOVA office culture"
             className="w-full h-auto object-cover"
           />
         </div>
         <div>
-          <h2 className="text-3xl font-bold mb-4">Why Work at Fiverr?</h2>
+          <h2 className="text-3xl font-bold mb-4">Why Work at JobNOVA?</h2>
           <p className="text-lg mb-6">
-            At Fiverr, we're building a platform that changes how the world works together. Our team is made up of
+            At JobNOVA, we're building a platform that changes how the world works together. Our team is made up of
             creative, collaborative, and dedicated people who share a common goal: to create opportunities for anyone in
             the world to build their business, brand, or dreams.
           </p>
@@ -214,29 +214,29 @@ export default function CareersPage() {
 
       {/* Employee Testimonials */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold mb-8 text-center">Life at Fiverr</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center">Life at JobNOVA</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
-              name: "Sarah Johnson",
+              name: "Bành Tuấn Kiệt",
               role: "Senior Product Manager",
-              image: "/placeholder.svg?height=300&width=300",
+              image: "/avatar/kiet.jpg?height=300&width=300",
               quote:
-                "Working at Fiverr has been the most rewarding experience of my career. The culture of innovation and the impact we make on freelancers' lives is incredible.",
+                "Working at JobNOVA has been the most rewarding experience of my career. The culture of innovation and the impact we make on freelancers' lives is incredible.",
             },
             {
-              name: "David Chen",
+              name: "Trần Quốc Anh",
               role: "Software Engineer",
-              image: "/placeholder.svg?height=300&width=300",
+              image: "/avatar/avt2.jpg?height=300&width=300",
               quote:
-                "I love the technical challenges we solve at Fiverr. We're constantly pushing the boundaries of what's possible while maintaining a healthy work-life balance.",
+                "I love the technical challenges we solve at JobNOVA. We're constantly pushing the boundaries of what's possible while maintaining a healthy work-life balance.",
             },
             {
-              name: "Maria Rodriguez",
+              name: "Nguyễn Nguyễn Thái Bảo",
               role: "Customer Success Lead",
-              image: "/placeholder.svg?height=300&width=300",
+              image: "/avatar/avt3.jpg?height=300&width=300",
               quote:
-                "The diversity of thought and inclusive environment at Fiverr makes it a special place to work. I've grown both professionally and personally here.",
+                "The diversity of thought and inclusive environment at JobNOVA makes it a special place to work. I've grown both professionally and personally here.",
             },
           ].map((testimonial, index) => (
             <Card key={index}>

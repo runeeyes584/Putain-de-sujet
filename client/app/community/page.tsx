@@ -10,10 +10,10 @@ export default function CommunityPage() {
   const featuredEvents = [
     {
       id: 1,
-      title: "Fiverr Freelance Summit 2024",
+      title: "JobNOVA Freelance Summit 2024",
       date: "June 15-17, 2024",
       location: "New York City",
-      image: "/placeholder.svg?height=400&width=600&text=Fiverr+Summit",
+      image: "/placeholder.svg?height=400&width=600&text=JobNOVA+Summit",
       attendees: 1200,
     },
     {
@@ -139,14 +139,14 @@ export default function CommunityPage() {
     <main className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <section className="mb-16 text-center">
-        <h1 className="mb-4 text-4xl font-bold md:text-5xl">Fiverr Community</h1>
+        <h1 className="mb-4 text-4xl font-bold md:text-5xl">JobNOVA Community</h1>
         <p className="mx-auto mb-8 max-w-3xl text-lg text-muted-foreground">
-          Connect, learn, and grow with millions of freelancers and businesses in the Fiverr community
+          Connect, learn, and grow with millions of freelancers and businesses in the JobNOVA community
         </p>
         <div className="relative mx-auto h-[400px] w-full max-w-5xl overflow-hidden rounded-xl">
           <Image
             src="/placeholder.svg?height=800&width=1200&text=Community+Hub"
-            alt="Fiverr Community"
+            alt="JobNOVA Community"
             fill
             className="object-cover"
             priority
@@ -420,7 +420,7 @@ export default function CommunityPage() {
       <section className="text-center">
         <h2 className="mb-4 text-2xl font-bold">Join Our Community Today</h2>
         <p className="mx-auto mb-6 max-w-2xl text-muted-foreground">
-          Connect with fellow freelancers, share your experiences, learn from experts, and grow your network. The Fiverr
+          Connect with fellow freelancers, share your experiences, learn from experts, and grow your network. The JobNOVA
           community is waiting for you!
         </p>
         <div className="flex flex-wrap justify-center gap-4">

@@ -135,7 +135,7 @@ export default function BlogPage() {
     <main className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <section className="mb-16 text-center">
-        <h1 className="mb-4 text-4xl font-bold md:text-5xl">Fiverr Blog</h1>
+        <h1 className="mb-4 text-4xl font-bold md:text-5xl">JobNOVA Blog</h1>
         <p className="mx-auto mb-8 max-w-3xl text-lg text-muted-foreground">
           Insights, tips, and resources to help you succeed in the freelance economy
         </p>

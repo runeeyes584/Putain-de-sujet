@@ -83,7 +83,7 @@ export default function TermsPage() {
               <section id="introduction" className="mb-8">
                 <h2 className="text-2xl font-bold">Introduction</h2>
                 <p>
-                  Welcome to Fiverr. These Terms of Service ("Terms") govern your access to and use of the Fiverr
+                  Welcome to JobNOVA. These Terms of Service ("Terms") govern your access to and use of the JobNOVA
                   website, mobile applications, and other online products and services (collectively, the "Services").
                 </p>
                 <p>
@@ -96,13 +96,13 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-bold">Key Terms</h2>
                 <ul>
                   <li>
-                    <strong>Buyer:</strong> Any user who purchases services on Fiverr.
+                    <strong>Buyer:</strong> Any user who purchases services on JobNOVA.
                   </li>
                   <li>
-                    <strong>Seller:</strong> Any user who offers and provides services on Fiverr.
+                    <strong>Seller:</strong> Any user who offers and provides services on JobNOVA.
                   </li>
                   <li>
-                    <strong>Gig:</strong> A service offered by a Seller on Fiverr.
+                    <strong>Gig:</strong> A service offered by a Seller on JobNOVA.
                   </li>
                   <li>
                     <strong>Order:</strong> A Buyer's purchase of a Gig from a Seller.
@@ -118,11 +118,11 @@ export default function TermsPage() {
                 <p>
                   To use our Services, you must create an account. When you create an account, you must provide accurate
                   and complete information. You are responsible for maintaining the security of your account and
-                  password. Fiverr cannot and will not be liable for any loss or damage resulting from your failure to
+                  password. JobNOVA cannot and will not be liable for any loss or damage resulting from your failure to
                   comply with this security obligation.
                 </p>
                 <p>
-                  You are responsible for all activity that occurs under your account. You agree to notify Fiverr
+                  You are responsible for all activity that occurs under your account. You agree to notify JobNOVA
                   immediately of any unauthorized use of your account or any other breach of security.
                 </p>
               </section>
@@ -130,7 +130,7 @@ export default function TermsPage() {
               <section id="purchasing" className="mb-8">
                 <h2 className="text-2xl font-bold">Purchasing Terms</h2>
                 <p>
-                  When you purchase a Gig on Fiverr, you are entering into a contract directly with the Seller. Fiverr
+                  When you purchase a Gig on JobNOVA, you are entering into a contract directly with the Seller. JobNOVA
                   is not a party to that contract but facilitates the transaction between you and the Seller.
                 </p>
                 <p>
@@ -147,11 +147,11 @@ export default function TermsPage() {
               <section id="payments" className="mb-8">
                 <h2 className="text-2xl font-bold">Payments</h2>
                 <p>
-                  All payments are processed through Fiverr's payment system. You agree to pay the full amount for any
+                  All payments are processed through JobNOVA's payment system. You agree to pay the full amount for any
                   Gig you purchase, including the Gig price, any additional services, and applicable fees and taxes.
                 </p>
                 <p>
-                  Fiverr holds your payment until the Order is completed. Once you confirm that the Order has been
+                  JobNOVA holds your payment until the Order is completed. Once you confirm that the Order has been
                   completed to your satisfaction, the payment is released to the Seller.
                 </p>
                 <p>
@@ -170,7 +170,7 @@ export default function TermsPage() {
                 </p>
                 <p>
                   Refund eligibility depends on various factors, including the nature of the issue, the Seller's
-                  revision policy, and whether the Seller has made reasonable efforts to address your concerns. Fiverr
+                  revision policy, and whether the Seller has made reasonable efforts to address your concerns. JobNOVA
                   reserves the right to determine refund eligibility at its sole discretion.
                 </p>
               </section>
@@ -179,7 +179,7 @@ export default function TermsPage() {
                 <h2 className="text-2xl font-bold">User Content</h2>
                 <p>
                   You retain ownership of any content you submit, post, or display on or through the Services. By
-                  submitting, posting, or displaying content on or through the Services, you grant Fiverr a worldwide,
+                  submitting, posting, or displaying content on or through the Services, you grant JobNOVA a worldwide,
                   non-exclusive, royalty-free license to use, reproduce, modify, adapt, publish, translate, distribute,
                   and display such content.
                 </p>
@@ -203,7 +203,7 @@ export default function TermsPage() {
                   <li>Engaging in fraudulent or deceptive practices</li>
                   <li>Harassing, threatening, or intimidating others</li>
                   <li>Posting or transmitting malicious code or viruses</li>
-                  <li>Attempting to gain unauthorized access to Fiverr's systems or user accounts</li>
+                  <li>Attempting to gain unauthorized access to JobNOVA's systems or user accounts</li>
                   <li>Using the Services to promote illegal activities or products</li>
                 </ul>
               </section>
@@ -211,7 +211,7 @@ export default function TermsPage() {
               <section id="termination" className="mb-8">
                 <h2 className="text-2xl font-bold">Termination</h2>
                 <p>
-                  Fiverr may terminate or suspend your account and access to the Services at any time, without prior
+                  JobNOVA may terminate or suspend your account and access to the Services at any time, without prior
                   notice or liability, for any reason, including if you breach these Terms.
                 </p>
                 <p>
@@ -229,7 +229,7 @@ export default function TermsPage() {
                   PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
                 </p>
                 <p>
-                  FIVERR DOES NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED OR ERROR-FREE, THAT DEFECTS WILL BE
+                  JobNOVA DOES NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED OR ERROR-FREE, THAT DEFECTS WILL BE
                   CORRECTED, OR THAT THE SERVICES OR THE SERVERS THAT MAKE THEM AVAILABLE ARE FREE OF VIRUSES OR OTHER
                   HARMFUL COMPONENTS.
                 </p>
@@ -238,7 +238,7 @@ export default function TermsPage() {
               <section id="liability" className="mb-8">
                 <h2 className="text-2xl font-bold">Limitation of Liability</h2>
                 <p>
-                  IN NO EVENT SHALL FIVERR, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS, BE LIABLE FOR ANY INDIRECT,
+                  IN NO EVENT SHALL JobNOVA, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS, BE LIABLE FOR ANY INDIRECT,
                   INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF
                   PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM YOUR ACCESS TO OR USE OF OR
                   INABILITY TO ACCESS OR USE THE SERVICES.
@@ -264,7 +264,7 @@ export default function TermsPage() {
         <TabsContent value="sellers" className="pt-6">
           <div className="prose max-w-none">
             <p className="text-lg">
-              This tab would contain the Terms of Service specifically for Sellers on the Fiverr platform, including:
+              This tab would contain the Terms of Service specifically for Sellers on the JobNOVA platform, including:
             </p>
             <ul>
               <li>Seller eligibility requirements</li>
@@ -281,7 +281,7 @@ export default function TermsPage() {
         <TabsContent value="business" className="pt-6">
           <div className="prose max-w-none">
             <p className="text-lg">
-              This tab would contain the Terms of Service specifically for Business users of the Fiverr platform,
+              This tab would contain the Terms of Service specifically for Business users of the JobNOVA platform,
               including:
             </p>
             <ul>

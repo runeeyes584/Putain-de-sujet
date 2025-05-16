@@ -106,8 +106,8 @@ export function Navbar() {
         <div className="container flex h-16 items-center">
           <div className="mr-4 flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
-              <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-              <span className="hidden font-bold sm:inline-block">Fiverr Clone</span>
+              <Image src="/logo.png" alt="Logo" width={60} height={60} />
+              <span className="hidden font-bold sm:inline-block">JobNOVA</span>
             </Link>
           </div>
 

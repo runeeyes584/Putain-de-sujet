@@ -8,12 +8,13 @@ export default function NotFoundPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center">
       <div className="max-w-md">
-        <div className="mb-8">
+        <div className="mb-8 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#F7F9FA] opacity-50 rounded-full blur-xl" />
           <Image
-            src="/placeholder.svg?height=200&width=200"
+            src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif"
             alt="404 Illustration"
-            width={200}
-            height={200}
+            width={300}
+            height={300}
             className="mx-auto"
           />
         </div>

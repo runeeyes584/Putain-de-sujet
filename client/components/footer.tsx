@@ -49,22 +49,22 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/about/careers" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Careers
                 </Link>
               </li>
               <li>
-                <Link href="/press" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/about/press" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Press & News
                 </Link>
               </li>
               <li>
-                <Link href="/partnerships" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/about/partnerships" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Partnerships
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/about/privacy-policy" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Privacy Policy
                 </Link>
               </li>
@@ -81,12 +81,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/trust" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/support/trust-safety" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Trust & Safety
                 </Link>
               </li>
               <li>
-                <Link href="/selling" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/support/selling" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Selling on Freelance
                 </Link>
               </li>
@@ -103,27 +103,27 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-semibold uppercase text-gray-900">Community</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/events" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/community/events" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/community/blog" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/forum" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/community/forum" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Forum
                 </Link>
               </li>
               <li>
-                <Link href="/podcast" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/community/podcast" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Podcast
                 </Link>
               </li>
               <li>
-                <Link href="/affiliates" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
+                <Link href="/community/affiliates" className="text-gray-600 hover:text-emerald-600 transition-colors duration-200">
                   Affiliates
                 </Link>
               </li>
@@ -156,9 +156,9 @@ export function Footer() {
         <div className="mt-12 flex flex-col items-center justify-between gap-6 border-t border-gray-200 pt-8 md:flex-row">
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:opacity-80 transition-opacity duration-200">
-              <Image src="/placeholder.svg?height=32&width=100" alt="Freelance Logo" width={100} height={32} />
+              <Image src="/logo.png?height=32&width=100" alt="Freelance Logo" width={100} height={32} />
             </Link>
-            <span className="text-sm text-gray-500">© 2023 Freelance Inc.</span>
+            <span className="text-sm text-gray-500">© 2025 JobNOVA Inc.</span>
           </div>
 
           <div className="flex gap-4">

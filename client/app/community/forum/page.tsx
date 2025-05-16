@@ -12,7 +12,7 @@ export default function ForumPage() {
     {
       id: "general",
       name: "General Discussion",
-      description: "General topics related to freelancing and Fiverr",
+      description: "General topics related to freelancing and JobNOVA",
       topics: 1245,
       posts: 8976,
     },
@@ -33,7 +33,7 @@ export default function ForumPage() {
     {
       id: "technical",
       name: "Technical Help",
-      description: "Technical questions about using the Fiverr platform",
+      description: "Technical questions about using the JobNOVA platform",
       topics: 654,
       posts: 3210,
     },
@@ -124,7 +124,7 @@ export default function ForumPage() {
     },
     {
       id: 5,
-      title: "Getting your first client on Fiverr: Success stories",
+      title: "Getting your first client on JobNOVA: Success stories",
       author: {
         name: "NewbiePro",
         image: "/placeholder.svg?height=100&width=100&text=NP",
@@ -135,7 +135,7 @@ export default function ForumPage() {
       lastActivity: "3 days ago",
       category: "Getting Started",
       lastPoster: {
-        name: "FiverrVeteran",
+        name: "JobNOVAVeteran",
         image: "/placeholder.svg?height=100&width=100&text=FV",
       },
     },
@@ -161,7 +161,7 @@ export default function ForumPage() {
     },
     {
       id: 7,
-      title: "New Fiverr feature discussion: What do you think?",
+      title: "New JobNOVA feature discussion: What do you think?",
       author: {
         name: "PlatformWatcher",
         image: "/placeholder.svg?height=100&width=100&text=PW",

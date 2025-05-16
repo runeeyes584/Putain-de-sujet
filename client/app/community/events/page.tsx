@@ -11,10 +11,10 @@ export default function EventsPage() {
   const upcomingEvents = [
     {
       id: 1,
-      title: "Fiverr Freelance Summit 2024",
+      title: "JobNOVA Freelance Summit 2024",
       date: "June 15-17, 2024",
       location: "New York City",
-      image: "/placeholder.svg?height=400&width=600&text=Fiverr+Summit",
+      image: "/placeholder.svg?height=400&width=600&text=JobNOVA+Summit",
       attendees: 1200,
       category: "Conference",
       description:
@@ -80,7 +80,7 @@ export default function EventsPage() {
   const pastEvents = [
     {
       id: 101,
-      title: "Fiverr Freelance Summit 2023",
+      title: "JobNOVA Freelance Summit 2023",
       date: "June 10-12, 2023",
       location: "Miami",
       image: "/placeholder.svg?height=400&width=600&text=2023+Summit",
@@ -117,7 +117,7 @@ export default function EventsPage() {
       <section className="mb-16 text-center">
         <h1 className="mb-4 text-4xl font-bold md:text-5xl">Community Events</h1>
         <p className="mx-auto mb-8 max-w-3xl text-lg text-muted-foreground">
-          Connect with the Fiverr community through virtual and in-person events designed to help you learn, network,
+          Connect with the JobNOVA community through virtual and in-person events designed to help you learn, network,
           and grow your freelance business
         </p>
       </section>
@@ -242,7 +242,7 @@ export default function EventsPage() {
           <div>
             <h2 className="mb-4 text-2xl font-bold">Host Your Own Event</h2>
             <p className="mb-6">
-              Are you an expert in your field? Share your knowledge with the Fiverr community by hosting a workshop,
+              Are you an expert in your field? Share your knowledge with the JobNOVA community by hosting a workshop,
               webinar, or meetup. We provide the platform and audience, you provide the expertise.
             </p>
             <Button asChild>
