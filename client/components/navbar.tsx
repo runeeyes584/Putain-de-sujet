@@ -105,7 +105,8 @@ export function Navbar() {
     if (!user) return null
     const publicMetadata = user.publicMetadata || {}
     if (publicMetadata.isAdmin) return "/admin"
-    if (publicMetadata.isSeller) return "/seller-dashboard"
+    if (publicMetadata.isSeller) return "/dashboard/user"
+    if (publicMetadata.isBuyer) return "/dashboard/buyer"
     return "/dashboard"
   }
 

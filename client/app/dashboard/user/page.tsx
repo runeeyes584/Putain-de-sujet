@@ -105,7 +105,7 @@ export default function UserDashboardPage() {
       <div className="container px-4 py-8">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <h1 className="text-3xl font-bold">User Dashboard</h1>
+            <h1 className="text-3xl font-bold">Seller Dashboard</h1>
             <p className="text-muted-foreground">Manage your orders, gigs, and saved items</p>
           </div>
           <Button className="bg-emerald-500 hover:bg-emerald-600" asChild>
