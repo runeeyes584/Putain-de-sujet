@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
-import { BarChart, Bell, Briefcase, Camera, ChevronLeft, ChevronRight, Code, Database, Heart, MessageSquare, Music, Palette, PenTool, Search, ShoppingCart, Smile, Video } from "lucide-react"
+import { BarChart, Bell, Briefcase, Camera, ChevronLeft, ChevronRight, Code, Database, Heart, LayoutDashboard, MessageSquare, Music, Palette, PenTool, Search, ShoppingCart, Smile, Video } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -14,6 +14,12 @@ import { LanguageCurrencySwitcher } from "@/components/language-currency-switche
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRole } from "@/contexts/role-context"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export function Navbar() {
   const { role, clearRole } = useRole()
@@ -26,7 +32,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,6 +91,18 @@ export function Navbar() {
     clearRole()
   }
 
+  const getDashboardLink = () => {
+    if (!user) return null
+    const publicMetadata = user.publicMetadata || {}
+    if (publicMetadata.isAdmin) return "/admin"
+    if (publicMetadata.isSeller) return "/seller-dashboard"
+    return "/dashboard"
+  }
+
+  const getDashboardTooltip = () => {
+    return "Dashboard"
+  }
+
   // Don't show navbar on role selection page
   if (pathname === "/select-role") {
     return null
@@ -101,22 +119,39 @@ export function Navbar() {
             </Link>
           </div>
 
-          <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-            <div className="w-full flex-1 md:w-auto md:flex-none">
-              <form onSubmit={handleSearch} className="relative flex-1 max-w-full md:max-w-[400px] mx-4 md:mx-8">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search services..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-10 pl-10 pr-4 text-base rounded-full bg-background placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-emerald-500"
-                />
-              </form>
-            </div>
-
+          <div className="flex flex-1 items-center gap-4">
+            <form onSubmit={handleSearch} className="relative flex-1 mx-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-4 text-base rounded-full bg-background placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-emerald-500"
+              />
+            </form>
             <div className="flex items-center gap-2 shrink-0">
               <LanguageCurrencySwitcher />
+              {user && getDashboardLink() && (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link href={getDashboardLink()!}>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                        >
+                          <LayoutDashboard className="h-5 w-5" />
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{getDashboardTooltip()}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <Link href="/notifications">
                 <Button variant="ghost" size="icon" className="hidden md:flex">
                   <Bell className="h-5 w-5" />
