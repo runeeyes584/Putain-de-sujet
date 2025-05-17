@@ -34,7 +34,7 @@ import skillsRoute from "./routes/skills.route.js";
 import userRoute from "./routes/user.route.js";
 import userSearchHistoryRoute from "./routes/userSearchHistory.route.js";
 import messageSocketHandler from "./socket/messageSocket.js";
-
+import cloudinaryRoute from "./routes/cloudinary.route.js"; 
 // .env
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -93,6 +93,7 @@ app.use("/api/seekerProfiles", seekerProfileRoute);
 app.use("/api/seekerSkills", seekerSkillRoute);
 app.use("/api/skills", skillsRoute);
 app.use("/api/userSearchHistory", userSearchHistoryRoute);
+app.use("/api/cloudinary", cloudinaryRoute);
 
 // Error middleware
 app.use((err, req, res, next) => {
