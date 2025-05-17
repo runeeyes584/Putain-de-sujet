@@ -16,6 +16,7 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "151004abyss",
   password: process.env.DB_PASSWORD || "453145",
+  password: process.env.DB_PASSWORD || "10022004",
   database: process.env.DB_NAME || "fiverr_new",
   port: 3306,
 });
