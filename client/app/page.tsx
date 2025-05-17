@@ -9,8 +9,7 @@ import { ArrowRight, TrendingUp, Clock, Heart, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useRole } from "@/contexts/role-context"
-import { FakeLogin } from "@/components/fake-login"
+import { useUser } from "@clerk/nextjs"
 import { PriceDisplay } from "@/components/price-display"
 import { SearchAutocomplete } from "@/components/search-autocomplete"
 import { ServiceCard } from "@/components/service-card"
@@ -355,10 +354,33 @@ const trendingServices = [
   },
 ]
 
+// AnimatedWords: Hiện từng từ một, gọi onDone khi xong
+function AnimatedWords({ text, className, onDone }: { text: string, className?: string, onDone?: () => void }) {
+  const words = text.split(" ");
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    if (visibleCount < words.length) {
+      const timeout = setTimeout(() => setVisibleCount(visibleCount + 1), 180);
+      return () => clearTimeout(timeout);
+    } else if (visibleCount === words.length && onDone) {
+      onDone();
+    }
+  }, [visibleCount, words.length, onDone]);
+
+  return (
+    <span className={className}>
+      {words.slice(0, visibleCount).join(" ")}
+      <span className="opacity-0">{words.slice(visibleCount).join(" ")}</span>
+    </span>
+  );
+}
+
 export default function Home() {
-  const { role } = useRole()
+  const { user, isSignedIn } = useUser();
   const [isClient, setIsClient] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [showSub, setShowSub] = useState(false);
 
   // Set isClient to true once component mounts
   useEffect(() => {
@@ -394,18 +416,23 @@ export default function Home() {
     {/* Nội dung chữ */}
     <div className="container mx-auto px-4 relative z-20 h-full flex items-center">
       <div className="max-w-3xl">
-        {isClient && role ? (
+        {(isClient && isSignedIn) ? (
           <div>
             <h1 className="mb-2 text-4xl font-bold md:text-5xl">
-              Welcome back, {role === "admin" ? "Admin" : "John"}!
+              <AnimatedWords
+                text={`Welcome back, ${(user?.firstName || '') + (user?.lastName ? ' ' + user.lastName : '') || user?.username || 'User'}!`}
+                onDone={() => setShowSub(true)}
+              />
             </h1>
-            <p className="mb-8 text-lg opacity-90">
-              {role === "admin"
-                ? "Manage your platform and help users find the perfect services."
-                : "Find the perfect services for your projects or continue where you left off."}
-            </p>
+            {showSub && (
+              <p className="mb-8 text-base md:text-lg opacity-80 text-gray-200">
+                <AnimatedWords
+                  text={user?.firstName ? "Manage your platform and help users find the perfect services." : "Find the perfect services for your projects or continue where you left off."}
+                />
+              </p>
+            )}
             <div className="flex flex-wrap gap-4">
-              {role === "admin" ? (
+              {user?.firstName ? (
                 <>
                   <Button asChild size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
                     <Link href="/dashboard/admin">Admin Dashboard</Link>
@@ -471,7 +498,7 @@ export default function Home() {
       </section>
 
       {/* Logged-in specific sections */}
-      {isClient && role && (
+      {isClient && isSignedIn && (
         <>
           {/* Recently Viewed Section */}
           <section className="py-12">
@@ -860,9 +887,6 @@ export default function Home() {
           </Button>
         </div>
       </section>
-
-      {/* Fake Login Component */}
-      <FakeLogin />
     </main>
   )
 }

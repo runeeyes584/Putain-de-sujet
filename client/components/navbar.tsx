@@ -9,7 +9,6 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 
-import { AuthModal } from "@/components/auth-modal"
 import { LanguageCurrencySwitcher } from "@/components/language-currency-switcher"
 import { Button } from "@/components/ui/button"
 import {
@@ -122,7 +121,7 @@ export function Navbar() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center">
           <div className="mr-4 flex">
-            <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Link href="/" prefetch className="mr-6 flex items-center space-x-2">
               <Image src="/logo.png" alt="Logo" width={32} height={32} />
               <span className="hidden font-bold sm:inline-block">JopNOVA</span>
             </Link>
@@ -149,7 +148,7 @@ export function Navbar() {
                     <TooltipProvider delayDuration={0}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Link href={getDashboardLink()!}>
+                          <Link href={getDashboardLink()!} prefetch>
                             <Button 
                               variant="ghost" 
                               size="icon" 
@@ -174,15 +173,17 @@ export function Navbar() {
                   >
                     <DropdownMenu open={openNotify}>
                       <DropdownMenuTrigger asChild>
-                        <Button
-                          tabIndex={-1}
-                          variant="ghost"
-                          size="icon"
-                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
-                          style={{ outline: "none", boxShadow: "none" }}
-                        >
-                          <Bell className="h-5 w-5" />
-                        </Button>
+                        <Link href="/notifications" prefetch>
+                          <Button
+                            tabIndex={-1}
+                            variant="ghost"
+                            size="icon"
+                            className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
+                            style={{ outline: "none", boxShadow: "none" }}
+                          >
+                            <Bell className="h-5 w-5" />
+                          </Button>
+                        </Link>
                       </DropdownMenuTrigger>
                       {openNotify && (
                         <div className="absolute top-full right-0 z-50 w-80 min-h-[400px] max-h-[700px] bg-white shadow-lg rounded-b-lg overflow-y-auto">
@@ -210,15 +211,17 @@ export function Navbar() {
                   >
                     <DropdownMenu open={openMsg}>
                       <DropdownMenuTrigger asChild>
-                        <Button
-                          tabIndex={-1}
-                          variant="ghost"
-                          size="icon"
-                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
-                          style={{ outline: "none", boxShadow: "none" }}
-                        >
-                          <MessageSquare className="h-5 w-5" />
-                        </Button>
+                        <Link href="/messages" prefetch>
+                          <Button
+                            tabIndex={-1}
+                            variant="ghost"
+                            size="icon"
+                            className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
+                            style={{ outline: "none", boxShadow: "none" }}
+                          >
+                            <MessageSquare className="h-5 w-5" />
+                          </Button>
+                        </Link>
                       </DropdownMenuTrigger>
                       {openMsg && (
                         <div className="absolute top-full right-0 z-50 w-80 min-h-[400px] max-h-[700px] bg-white shadow-lg rounded-b-lg overflow-y-auto">
@@ -388,7 +391,7 @@ export function Navbar() {
         </div>
       </header>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
     </>
   )
 }
