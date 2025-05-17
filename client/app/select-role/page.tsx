@@ -1,10 +1,10 @@
 "use client"
 
+import { toast } from "@/components/ui/use-toast"
 import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { toast } from "@/components/ui/use-toast"
-import { FaUserTie, FaUser } from "react-icons/fa"
+import { FaUser, FaUserTie } from "react-icons/fa"
 
 const roles = [
   {
@@ -24,11 +24,17 @@ const roles = [
 export default function SelectRole() {
   const { user } = useUser()
   const router = useRouter()
-  const [selected, setSelected] = useState<"seller" | "buyer" | null>(null)
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
+  const toggleRole = (role: string) => {
+    setSelectedRoles((prev) =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
+    )
+  }
+
   const handleContinue = async () => {
-    if (!selected || !user) return
+    if (selectedRoles.length === 0 || !user) return
     try {
       setIsLoading(true)
       const response = await fetch("http://localhost:8800/api/role/set-role", {
@@ -36,19 +42,19 @@ export default function SelectRole() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
-          role: selected,
+          roles: selectedRoles,
         }),
       })
       if (!response.ok) throw new Error("Failed to update role")
       toast({
         title: "Success",
-        description: `You have selected the role: ${selected === "seller" ? "Seller" : "Buyer"}`,
+        description: `Bạn đã chọn: ${selectedRoles.join(", ")}`,
       })
       window.location.href = "/"
     } catch (error) {
       toast({
         title: "Error",
-        description: "Could not update your role. Please try again later.",
+        description: "Không thể cập nhật vai trò. Vui lòng thử lại.",
         variant: "destructive",
       })
     } finally {
@@ -60,15 +66,15 @@ export default function SelectRole() {
     <div className="min-h-screen flex items-center justify-center bg-[#e9f0fb] px-2">
       <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-xl flex flex-col items-center relative">
         <h1 className="text-2xl md:text-3xl font-extrabold text-center mb-2 text-gray-900">Please select your role</h1>
-        <p className="text-gray-500 text-center mb-6 md:mb-8 max-w-md">How do you want to use this platform?</p>
+        <p className="text-gray-500 text-center mb-6 md:mb-8 max-w-md">You can choose one or both roles.</p>
         <div className="flex gap-6 w-full justify-center mb-8 flex-col md:flex-row">
           {roles.map((role) => {
-            const isActive = selected === role.key
+            const isActive = selectedRoles.includes(role.key)
             return (
               <button
                 key={role.key}
                 type="button"
-                onClick={() => setSelected(role.key as "seller" | "buyer")}
+                onClick={() => toggleRole(role.key)}
                 className={`
                   flex flex-col items-center px-6 py-8 rounded-xl border-2 shadow-md transition-all
                   w-full md:w-64 bg-white
@@ -88,7 +94,7 @@ export default function SelectRole() {
         </div>
         <button
           onClick={handleContinue}
-          disabled={!selected || isLoading}
+          disabled={selectedRoles.length === 0 || isLoading}
           className={`
             w-full md:w-64 py-3 rounded-full bg-blue-600 text-white font-semibold text-lg shadow
             transition-all hover:bg-blue-700 disabled:opacity-50
@@ -96,18 +102,7 @@ export default function SelectRole() {
         >
           {isLoading ? "Processing..." : "Continue"}
         </button>
-        {/* Dots indicator for 2 roles */}
-        <div className="flex gap-2 mt-6">
-          {roles.map((role) => (
-            <span
-              key={role.key}
-              className={`block w-3 h-3 rounded-full transition-all duration-200
-                ${selected === role.key ? "bg-blue-600" : "bg-gray-300"}
-              `}
-            />
-          ))}
-        </div>
       </div>
     </div>
   )
-} 
+}

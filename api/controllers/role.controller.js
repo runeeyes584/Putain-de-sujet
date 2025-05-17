@@ -2,27 +2,26 @@ import { Clerk } from '@clerk/clerk-sdk-node';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Khởi tạo Clerk instance với secret key
 const clerk = new Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
-// API: POST /api/role/set-role
 export const setUserRole = async (req, res) => {
   try {
-    const { userId, role } = req.body;
+    const { userId, roles } = req.body; // roles là mảng, ví dụ: ["seller", "buyer"]
 
-    if (!userId || !role) {
-      return res.status(400).json({ error: "Thiếu userId hoặc role" });
+    if (!userId || !Array.isArray(roles)) {
+      return res.status(400).json({ error: "Thiếu userId hoặc roles không hợp lệ" });
     }
 
-    // Cập nhật role trong publicMetadata của Clerk user
+    const metadata = {
+      isSeller: roles.includes("seller"),
+      isBuyer: roles.includes("buyer"),
+    };
+
     await clerk.users.updateUserMetadata(userId, {
-      publicMetadata: {
-        isSeller: role === "seller"
-      }
+      publicMetadata: metadata
     });
 
     res.status(200).json({ message: "Cập nhật vai trò thành công" });
-
   } catch (error) {
     console.error("Lỗi cập nhật role:", error);
     res.status(500).json({ error: "Cập nhật thất bại" });
