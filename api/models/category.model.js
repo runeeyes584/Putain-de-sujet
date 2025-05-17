@@ -14,14 +14,6 @@ const Category = (sequelize) =>
         allowNull: false,
         unique: true,
       },
-      desc: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-      },
-      img: {
-        type: DataTypes.STRING(255), 
-        allowNull: true,
-      },
     },
     {
       tableName: "category",

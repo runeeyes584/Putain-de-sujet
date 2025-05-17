@@ -46,16 +46,15 @@ export const handleClerkWebhook = async (req, res) => {
         gender: clerkGender,
       } = evt.data;
 
-      let dbUserRole = 'seeker';
-      if (public_metadata?.isAdmin === true) {
-          dbUserRole = 'admin';
-      } else if (public_metadata?.isSeller === true) {
-          dbUserRole = 'employer';
-      }
+      let dbUserRoles = [];
+      if (public_metadata?.isAdmin) dbUserRoles.push("admin");
+      if (public_metadata?.isSeller) dbUserRoles.push("employer");
+      if (public_metadata?.isBuyer) dbUserRoles.push("seeker");
+      if (dbUserRoles.length === 0) dbUserRoles.push("seeker");
 
       const userData = {
         clerk_id: id,
-        user_role: dbUserRole,
+        user_roles: dbUserRoles,
         country: public_metadata?.country || "Việt Nam",
         description: public_metadata?.description || null,
         registration_date: new Date(created_at).toISOString().slice(0, 10),

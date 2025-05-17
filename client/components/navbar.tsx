@@ -12,20 +12,18 @@ import { useEffect, useRef, useState } from "react"
 import { AuthModal } from "@/components/auth-modal"
 import { LanguageCurrencySwitcher } from "@/components/language-currency-switcher"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { useRole } from "@/contexts/role-context"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { useRole } from "@/contexts/role-context"
 
 export function Navbar() {
   const { role, clearRole } = useRole()
@@ -180,7 +178,7 @@ export function Navbar() {
                           tabIndex={-1}
                           variant="ghost"
                           size="icon"
-                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 outline-none ring-0 !outline-none !ring-0"
+                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
                           style={{ outline: "none", boxShadow: "none" }}
                         >
                           <Bell className="h-5 w-5" />
@@ -216,7 +214,7 @@ export function Navbar() {
                           tabIndex={-1}
                           variant="ghost"
                           size="icon"
-                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 outline-none ring-0 !outline-none !ring-0"
+                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 !outline-none !ring-0"
                           style={{ outline: "none", boxShadow: "none" }}
                         >
                           <MessageSquare className="h-5 w-5" />

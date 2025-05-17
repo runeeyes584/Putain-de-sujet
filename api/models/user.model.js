@@ -25,11 +25,11 @@ const User = (sequelize) =>
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      user_role: {
-        type: DataTypes.ENUM("seeker", "employer", "admin"),
-        allowNull: false,
-        defaultValue: "seeker",
-      },
+      user_roles: {
+  type: DataTypes.JSON,
+  allowNull: false,
+  defaultValue: ["seeker"]
+},
       date_of_birth: {
         type: DataTypes.DATEONLY,
         allowNull: true,
