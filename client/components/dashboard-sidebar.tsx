@@ -22,6 +22,7 @@ import {
   Menu,
   X,
 } from "lucide-react"
+import { useUser } from "@clerk/nextjs"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -30,6 +31,7 @@ export function DashboardSidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false) // For demo purposes
+  const { user, isSignedIn } = useUser();
 
   const userLinks = [
     {
@@ -130,30 +132,22 @@ export function DashboardSidebar() {
         }`}
       >
         <div className="flex h-full flex-col">
-          {/* Sidebar Header */}
-          <div className="flex h-16 items-center justify-between px-4">
-            <Link href="/" className="flex items-center">
-              <Image src="/placeholder.svg?height=32&width=100" alt="Freelance Logo" width={100} height={32} />
-            </Link>
-            <Button variant="ghost" size="icon" onClick={toggleSidebar} className="lg:hidden">
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-
-          <Separator />
-
           {/* User Profile */}
           <div className="flex items-center gap-3 p-4">
             <Image
-              src="/placeholder.svg?height=40&width=40"
+              src={user?.imageUrl || "/placeholder.svg?height=40&width=40"}
               alt="User"
               width={40}
               height={40}
               className="rounded-full"
             />
             <div>
-              <div className="font-medium">John Smith</div>
-              <div className="text-xs text-gray-500">john.smith@example.com</div>
+              <div className="font-medium">
+                {(user?.firstName || user?.lastName)
+                  ? `${user?.firstName || ""} ${user?.lastName || ""}`.trim()
+                  : "User"}
+              </div>
+              <div className="text-xs text-gray-500">{user?.primaryEmailAddress?.emailAddress || ""}</div>
             </div>
           </div>
 
@@ -162,32 +156,31 @@ export function DashboardSidebar() {
             <nav className="flex flex-col gap-1">
               {/* Buyer Section */}
               <div className="mb-4">
-                <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-gray-500">Buyer</h3>
-                {userLinks.map((link) => (
-                  <SidebarLink
-                    key={link.title}
-                    href={link.href}
-                    icon={link.icon}
-                    title={link.title}
-                    badge={link.badge}
-                    isActive={pathname === link.href}
-                  />
-                ))}
+                <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-gray-500">BUYER</h3>
+                {userLinks
+                  .filter(link => link.title !== "Dashboard")
+                  .map((link) => (
+                    <SidebarLink
+                      key={link.title}
+                      href={link.href}
+                      icon={link.icon}
+                      title={link.title}
+                      isActive={pathname === link.href}
+                      badge={link.badge}
+                    />
+                  ))}
               </div>
 
               {/* Seller Section */}
               <div className="mb-4">
-                <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-gray-500">Seller</h3>
-                {sellerLinks.map((link) => (
-                  <SidebarLink
-                    key={link.title}
-                    href={link.href}
-                    icon={link.icon}
-                    title={link.title}
-                    badge={link.badge}
-                    isActive={pathname === link.href}
-                  />
-                ))}
+                <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-gray-500">SELLER</h3>
+                <SidebarLink
+                  key={sellerLinks[0].title}
+                  href={sellerLinks[0].href}
+                  icon={sellerLinks[0].icon}
+                  title={sellerLinks[0].title}
+                  isActive={pathname === sellerLinks[0].href}
+                />
                 <Button asChild variant="ghost" className="w-full justify-start pl-2 text-emerald-600">
                   <Link href="/create-gig" className="flex items-center gap-2">
                     <ChevronRight className="h-5 w-5" />
