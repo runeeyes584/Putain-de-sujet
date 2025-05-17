@@ -131,49 +131,51 @@ export function Navbar() {
               />
             </form>
             <div className="flex items-center gap-2 shrink-0">
-              <LanguageCurrencySwitcher />
-              {user && getDashboardLink() && (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link href={getDashboardLink()!}>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
-                        >
-                          <LayoutDashboard className="h-5 w-5" />
-                        </Button>
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{getDashboardTooltip()}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-              <Link href="/notifications">
-                <Button variant="ghost" size="icon" className="hidden md:flex">
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/messages">
-                <Button variant="ghost" size="icon" className="hidden md:flex">
-                  <MessageSquare className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/saved">
-                <Button variant="ghost" size="icon" className="hidden md:flex">
-                  <Heart className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/orders">
-                <Button variant="ghost" size="icon" className="hidden md:flex">
-                  <ShoppingCart className="h-5 w-5" />
-                </Button>
-              </Link>
               {isSignedIn ? (
-                <UserButton afterSignOutUrl="/" />
+                <>
+                  <LanguageCurrencySwitcher />
+                  {user && getDashboardLink() && (
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href={getDashboardLink()!}>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                            >
+                              <LayoutDashboard className="h-5 w-5" />
+                            </Button>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{getDashboardTooltip()}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  <Link href="/notifications">
+                    <Button variant="ghost" size="icon" className="hidden md:flex">
+                      <Bell className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/messages">
+                    <Button variant="ghost" size="icon" className="hidden md:flex">
+                      <MessageSquare className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/saved">
+                    <Button variant="ghost" size="icon" className="hidden md:flex">
+                      <Heart className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/orders">
+                    <Button variant="ghost" size="icon" className="hidden md:flex">
+                      <ShoppingCart className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <UserButton afterSignOutUrl="/" />
+                </>
               ) : (
                 <div className="flex items-center gap-2">
                   <SignInButton mode="modal">
