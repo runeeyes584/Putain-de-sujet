@@ -20,9 +20,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Navbar() {
   const { role, clearRole } = useRole()
+  const { isSignedIn, isLoaded, user } = useUser();
   const pathname = usePathname()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
@@ -32,7 +39,10 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { isSignedIn, user } = useUser();
+  const [openNotify, setOpenNotify] = useState(false);
+  const [openMsg, setOpenMsg] = useState(false);
+  const notifications: { title: string; time: string }[] = [] // Thay bằng dữ liệu thực tế nếu có
+  const messages: { title: string; time: string }[] = [] // Thay bằng dữ liệu thực tế nếu có
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -131,7 +141,9 @@ export function Navbar() {
               />
             </form>
             <div className="flex items-center gap-2 shrink-0">
-              {isSignedIn ? (
+              {!isLoaded ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              ) : isSignedIn ? (
                 <>
                   <LanguageCurrencySwitcher />
                   {user && getDashboardLink() && (
@@ -142,7 +154,7 @@ export function Navbar() {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                              className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0 ring-0 outline-none"
                             >
                               <LayoutDashboard className="h-5 w-5" />
                             </Button>
@@ -154,26 +166,111 @@ export function Navbar() {
                       </Tooltip>
                     </TooltipProvider>
                   )}
-                  <Link href="/notifications">
-                    <Button variant="ghost" size="icon" className="hidden md:flex">
-                      <Bell className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link href="/messages">
-                    <Button variant="ghost" size="icon" className="hidden md:flex">
-                      <MessageSquare className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link href="/saved">
-                    <Button variant="ghost" size="icon" className="hidden md:flex">
-                      <Heart className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link href="/orders">
-                    <Button variant="ghost" size="icon" className="hidden md:flex">
-                      <ShoppingCart className="h-5 w-5" />
-                    </Button>
-                  </Link>
+
+                  {/* Notify Dropdown on hover - fix hover gap */}
+                  <div
+                    className="relative flex items-center"
+                    onMouseEnter={() => setOpenNotify(true)}
+                    onMouseLeave={() => setOpenNotify(false)}
+                  >
+                    <DropdownMenu open={openNotify}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          tabIndex={-1}
+                          variant="ghost"
+                          size="icon"
+                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 outline-none ring-0 !outline-none !ring-0"
+                          style={{ outline: "none", boxShadow: "none" }}
+                        >
+                          <Bell className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      {openNotify && (
+                        <div className="absolute top-full right-0 z-50 w-80 min-h-[400px] max-h-[700px] bg-white shadow-lg rounded-b-lg overflow-y-auto">
+                          <div className="font-semibold px-4 py-2 border-b">Notifications</div>
+                          {notifications.length === 0 ? (
+                            <div className="text-center text-gray-500 py-8">No notifications</div>
+                          ) : (
+                            notifications.map((item, idx) => (
+                              <div key={idx} className="whitespace-normal py-3 px-4 hover:bg-gray-100 cursor-pointer">
+                                <div className="font-medium">{item.title}</div>
+                                <div className="text-xs text-gray-500">{item.time}</div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Message Dropdown on hover - fix hover gap */}
+                  <div
+                    className="relative flex items-center"
+                    onMouseEnter={() => setOpenMsg(true)}
+                    onMouseLeave={() => setOpenMsg(false)}
+                  >
+                    <DropdownMenu open={openMsg}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          tabIndex={-1}
+                          variant="ghost"
+                          size="icon"
+                          className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 outline-none ring-0 !outline-none !ring-0"
+                          style={{ outline: "none", boxShadow: "none" }}
+                        >
+                          <MessageSquare className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      {openMsg && (
+                        <div className="absolute top-full right-0 z-50 w-80 min-h-[400px] max-h-[700px] bg-white shadow-lg rounded-b-lg overflow-y-auto">
+                          <div className="font-semibold px-4 py-2 border-b">Messages</div>
+                          {messages.length === 0 ? (
+                            <div className="text-center text-gray-500 py-8">No messages</div>
+                          ) : (
+                            messages.map((item, idx) => (
+                              <div key={idx} className="whitespace-normal py-3 px-4 hover:bg-gray-100 cursor-pointer">
+                                <div className="font-medium">{item.title}</div>
+                                <div className="text-xs text-gray-500">{item.time}</div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Saved Tooltip */}
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link href="/saved">
+                          <Button variant="ghost" size="icon" className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0 ring-0 outline-none">
+                            <Heart className="h-5 w-5" />
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Favorites Jobs</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  {/* Cart Tooltip */}
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link href="/orders">
+                          <Button variant="ghost" size="icon" className="hidden md:flex hover:bg-emerald-50 hover:text-emerald-600 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0 ring-0 outline-none">
+                            <ShoppingCart className="h-5 w-5" />
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Cart</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
                   <UserButton afterSignOutUrl="/" />
                 </>
               ) : (
