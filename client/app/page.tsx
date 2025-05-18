@@ -408,7 +408,7 @@ export default function Home() {
       playsInline
       className="absolute top-0 left-0 w-full h-full object-cover z-0"
     >
-      <source src="https://player.cloudinary.com/embed/?cloud_name=dkfjtkhe9&public_id=video-banner_zjqq2d&profile=cld-looping" type="video/mp4" />
+      <source src="https://res.cloudinary.com/kaleidoscop3/video/upload/v1747545962/video-banner_zjqq2d.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
 
