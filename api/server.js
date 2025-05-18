@@ -10,6 +10,7 @@ import { initSocket } from "./controllers/message.controller.js";
 import { sequelize } from "./models/Sequelize-mysql.js";
 import adminLogRoute from "./routes/adminLog.route.js";
 import categoryRoute from "./routes/category.route.js";
+import cloudinaryRoute from "./routes/cloudinary.route.js";
 import companyRoute from "./routes/company.route.js";
 import companyImageRoute from "./routes/companyImage.route.js";
 import contactFormRoute from "./routes/contactForm.route.js";
@@ -34,7 +35,6 @@ import skillsRoute from "./routes/skills.route.js";
 import userRoute from "./routes/user.route.js";
 import userSearchHistoryRoute from "./routes/userSearchHistory.route.js";
 import messageSocketHandler from "./socket/messageSocket.js";
-import cloudinaryRoute from "./routes/cloudinary.route.js"; 
 // .env
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 

@@ -101,207 +101,200 @@ export default function UserDashboardPage() {
   }
 
   return (
-    <ProtectedRoute allowedRoles={["user"]}>
-      <div className="container px-4 py-8">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold">Seller Dashboard</h1>
-            <p className="text-muted-foreground">Manage your orders, gigs, and saved items</p>
+    <div className="container px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+        <p className="text-muted-foreground">Manage your gigs and orders</p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl">Active Orders</CardTitle>
+            <CardDescription>Orders in progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{mockOrders.filter((o) => o.status === "in_progress").length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl">Completed Orders</CardTitle>
+            <CardDescription>Successfully delivered</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{mockOrders.filter((o) => o.status === "delivered").length}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl">Saved Gigs</CardTitle>
+            <CardDescription>Items in your wishlist</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{mockSavedGigs.length}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="orders" className="mt-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="orders">My Orders</TabsTrigger>
+          <TabsTrigger value="gigs">My Gigs</TabsTrigger>
+          <TabsTrigger value="saved">Saved Gigs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="orders" className="space-y-4">
+          <h2 className="text-xl font-semibold">Recent Orders</h2>
+          <div className="rounded-lg border">
+            {mockOrders.map((order) => (
+              <div
+                key={order.id}
+                className="flex flex-col border-b p-4 last:border-0 md:flex-row md:items-center md:justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <Image
+                    src={order.image || "/placeholder.svg"}
+                    alt={order.title}
+                    width={60}
+                    height={60}
+                    className="rounded-md"
+                  />
+                  <div>
+                    <h3 className="font-medium">{order.title}</h3>
+                    <p className="text-sm text-muted-foreground">Seller: {order.seller}</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-3 md:mt-0">
+                  <Badge
+                    variant={
+                      order.status === "in_progress"
+                        ? "default"
+                        : order.status === "delivered"
+                          ? "success"
+                          : "warning"
+                    }
+                  >
+                    {order.status === "in_progress"
+                      ? "In Progress"
+                      : order.status === "delivered"
+                        ? "Delivered"
+                        : "Revision"}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Clock className="h-4 w-4" />
+                    <span>Due: {new Date(order.dueDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="font-medium">${order.price}</div>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href={`/orders/${order.id}`}>View Details</Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-          <Button className="bg-emerald-500 hover:bg-emerald-600" asChild>
-            <Link href="/create-gig">Create New Gig</Link>
-          </Button>
-        </div>
+          <div className="flex justify-end">
+            <Button variant="outline" asChild>
+              <Link href="/orders">View All Orders</Link>
+            </Button>
+          </div>
+        </TabsContent>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Active Orders</CardTitle>
-              <CardDescription>Orders in progress</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{mockOrders.filter((o) => o.status === "in_progress").length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Completed Orders</CardTitle>
-              <CardDescription>Successfully delivered</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{mockOrders.filter((o) => o.status === "delivered").length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Saved Gigs</CardTitle>
-              <CardDescription>Items in your wishlist</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{mockSavedGigs.length}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="orders" className="mt-8">
-          <TabsList className="mb-4">
-            <TabsTrigger value="orders">My Orders</TabsTrigger>
-            <TabsTrigger value="gigs">My Gigs</TabsTrigger>
-            <TabsTrigger value="saved">Saved Gigs</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="orders" className="space-y-4">
-            <h2 className="text-xl font-semibold">Recent Orders</h2>
-            <div className="rounded-lg border">
-              {mockOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="flex flex-col border-b p-4 last:border-0 md:flex-row md:items-center md:justify-between"
-                >
-                  <div className="flex items-center gap-4">
+        <TabsContent value="gigs" className="space-y-4">
+          <h2 className="text-xl font-semibold">My Gigs</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {mockGigs.map((gig) => (
+              <Card key={gig.id}>
+                <CardContent className="p-6">
+                  <div className="flex gap-4">
                     <Image
-                      src={order.image || "/placeholder.svg"}
-                      alt={order.title}
+                      src={gig.image || "/placeholder.svg"}
+                      alt={gig.title}
                       width={60}
                       height={60}
                       className="rounded-md"
                     />
                     <div>
-                      <h3 className="font-medium">{order.title}</h3>
-                      <p className="text-sm text-muted-foreground">Seller: {order.seller}</p>
+                      <h3 className="font-medium">{gig.title}</h3>
+                      <div className="mt-1 flex items-center gap-2">
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                          <span className="ml-1 text-sm">{gig.rating}</span>
+                        </div>
+                        <span className="text-sm text-muted-foreground">({gig.reviews} reviews)</span>
+                        <span className="font-medium">${gig.price}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-4 flex flex-wrap items-center gap-3 md:mt-0">
-                    <Badge
-                      variant={
-                        order.status === "in_progress"
-                          ? "default"
-                          : order.status === "delivered"
-                            ? "success"
-                            : "warning"
-                      }
-                    >
-                      {order.status === "in_progress"
-                        ? "In Progress"
-                        : order.status === "delivered"
-                          ? "Delivered"
-                          : "Revision"}
-                    </Badge>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Clock className="h-4 w-4" />
-                      <span>Due: {new Date(order.dueDate).toLocaleDateString()}</span>
+
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <div className="mb-1 flex items-center justify-between text-sm">
+                        <span>Impressions</span>
+                        <span>{gig.impressions}</span>
+                      </div>
+                      <Progress value={(gig.impressions / 3000) * 100} className="h-2" />
                     </div>
-                    <div className="font-medium">${order.price}</div>
+                    <div>
+                      <div className="mb-1 flex items-center justify-between text-sm">
+                        <span>Clicks</span>
+                        <span>{gig.clicks}</span>
+                      </div>
+                      <Progress value={(gig.clicks / 200) * 100} className="h-2" />
+                    </div>
+                    <div>
+                      <div className="mb-1 flex items-center justify-between text-sm">
+                        <span>Orders</span>
+                        <span>{gig.orders}</span>
+                      </div>
+                      <Progress value={(gig.orders / 30) * 100} className="h-2" />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex justify-between">
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={`/orders/${order.id}`}>View Details</Link>
+                      <Link href={`/gigs/${gig.id}`}>View Gig</Link>
+                    </Button>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={`/gigs/${gig.id}/edit`}>Edit Gig</Link>
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end">
-              <Button variant="outline" asChild>
-                <Link href="/orders">View All Orders</Link>
-              </Button>
-            </div>
-          </TabsContent>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-          <TabsContent value="gigs" className="space-y-4">
-            <h2 className="text-xl font-semibold">My Gigs</h2>
-            <div className="grid gap-6 md:grid-cols-2">
-              {mockGigs.map((gig) => (
-                <Card key={gig.id}>
-                  <CardContent className="p-6">
-                    <div className="flex gap-4">
-                      <Image
-                        src={gig.image || "/placeholder.svg"}
-                        alt={gig.title}
-                        width={60}
-                        height={60}
-                        className="rounded-md"
-                      />
-                      <div>
-                        <h3 className="font-medium">{gig.title}</h3>
-                        <div className="mt-1 flex items-center gap-2">
-                          <div className="flex items-center">
-                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                            <span className="ml-1 text-sm">{gig.rating}</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">({gig.reviews} reviews)</span>
-                          <span className="font-medium">${gig.price}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 space-y-3">
-                      <div>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <span>Impressions</span>
-                          <span>{gig.impressions}</span>
-                        </div>
-                        <Progress value={(gig.impressions / 3000) * 100} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <span>Clicks</span>
-                          <span>{gig.clicks}</span>
-                        </div>
-                        <Progress value={(gig.clicks / 200) * 100} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="mb-1 flex items-center justify-between text-sm">
-                          <span>Orders</span>
-                          <span>{gig.orders}</span>
-                        </div>
-                        <Progress value={(gig.orders / 30) * 100} className="h-2" />
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex justify-between">
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={`/gigs/${gig.id}`}>View Gig</Link>
-                      </Button>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={`/gigs/${gig.id}/edit`}>Edit Gig</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="saved" className="space-y-4">
-            <h2 className="text-xl font-semibold">Saved Gigs</h2>
-            <div className="grid gap-6 md:grid-cols-2">
-              {mockSavedGigs.map((gig) => (
-                <ServiceCard
-                  key={gig.id}
-                  service={{
-                    id: gig.id,
-                    title: gig.title,
-                    price: gig.price,
-                    image: gig.image,
-                    seller: {
-                      name: gig.seller,
-                      avatar: "/placeholder.svg",
-                      level: "Level 1"
-                    },
-                    rating: gig.rating,
-                    reviewCount: gig.reviews,
-                    isSaved: true
-                  }}
-                />
-              ))}
-            </div>
-            <div className="flex justify-end">
-              <Button variant="outline" asChild>
-                <Link href="/saved-gigs">View All Saved Gigs</Link>
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </ProtectedRoute>
+        <TabsContent value="saved" className="space-y-4">
+          <h2 className="text-xl font-semibold">Saved Gigs</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {mockSavedGigs.map((gig) => (
+              <ServiceCard
+                key={gig.id}
+                service={{
+                  id: gig.id,
+                  title: gig.title,
+                  price: gig.price,
+                  image: gig.image,
+                  seller: {
+                    name: gig.seller,
+                    avatar: "/placeholder.svg",
+                    level: "Level 1"
+                  },
+                  rating: gig.rating,
+                  reviewCount: gig.reviews,
+                  isSaved: true
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex justify-end">
+            <Button variant="outline" asChild>
+              <Link href="/saved-gigs">View All Saved Gigs</Link>
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }

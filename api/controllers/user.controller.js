@@ -50,7 +50,6 @@ export const handleClerkWebhook = async (req, res) => {
       if (public_metadata?.isAdmin) dbUserRoles.push("admin");
       if (public_metadata?.isSeller) dbUserRoles.push("employer");
       if (public_metadata?.isBuyer) dbUserRoles.push("seeker");
-      if (dbUserRoles.length === 0) dbUserRoles.push("seeker");
 
       const userData = {
         clerk_id: id,

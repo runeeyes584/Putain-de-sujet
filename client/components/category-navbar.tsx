@@ -2,18 +2,21 @@
 
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useRole } from "@/contexts/role-context"
+import { useUser } from "@clerk/nextjs"
 
 export function CategoryNavbar() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const { role } = useRole()
+  const { user } = useUser()
+  const isAdmin = user?.publicMetadata?.isAdmin
+  const isSeller = user?.publicMetadata?.isSeller
+  const isBuyer = user?.publicMetadata?.isBuyer
 
   // Get the current category from search params
   const currentCategory = searchParams.get("category")
 
   // Don't show category navbar on role selection page or for admin users
-  if (pathname === "/select-role" || role === "admin") {
+  if (pathname === "/select-role" || isAdmin) {
     return null
   }
 

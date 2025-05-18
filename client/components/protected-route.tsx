@@ -1,41 +1,51 @@
 "use client"
 
-import type React from "react"
-
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useRole } from "@/contexts/role-context"
-import { toast } from "@/components/ui/use-toast"
+import { useUser } from "@clerk/nextjs"
 
-type Role = "user" | "admin" | null
-
-interface ProtectedRouteProps {
-  children: React.ReactNode
-  allowedRoles: Role[]
-}
-
-export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { role, isAuthorized } = useRole()
+export function ProtectedRoute() {
+  const { isSignedIn, user } = useUser()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    // If no role is set, redirect to role selection
-    if (role === null) {
-      router.push("/select-role")
-      return
-    }
+    if (isSignedIn && user) {
+      const publicMetadata = user.publicMetadata || {}
+      const isAdmin = publicMetadata.isAdmin
+      const isSeller = publicMetadata.isSeller
+      const isBuyer = publicMetadata.isBuyer
 
-    // If role is not authorized, show error and redirect
-    if (!isAuthorized(allowedRoles)) {
-      toast({
-        title: "Access Denied",
-        description: `You don't have permission to access this page as ${role}`,
-        variant: "destructive",
-      })
-      router.push("/select-role")
-    }
-  }, [role, isAuthorized, allowedRoles, router])
+      // Nếu không có role nào thì chuyển đến select-role
+      if (!isAdmin && !isSeller && !isBuyer) {
+        router.push("/select-role")
+        return
+      }
 
-  // Only render children if authorized
-  return isAuthorized(allowedRoles) ? <>{children}</> : null
+      // Nếu đang ở trang dashboard và có nhiều role thì chuyển đến dashboard chính
+      if (pathname === "/dashboard" && (isAdmin || (isSeller && isBuyer))) {
+        return
+      }
+
+      // Nếu đang ở trang dashboard/user và không phải seller thì chuyển về dashboard chính
+      if (pathname === "/dashboard/user" && !isSeller) {
+        router.push("/dashboard")
+        return
+      }
+
+      // Nếu đang ở trang dashboard/buyer và không phải buyer thì chuyển về dashboard chính
+      if (pathname === "/dashboard/buyer" && !isBuyer) {
+        router.push("/dashboard")
+        return
+      }
+
+      // Nếu đang ở trang dashboard/admin và không phải admin thì chuyển về dashboard chính
+      if (pathname === "/dashboard/admin" && !isAdmin) {
+        router.push("/dashboard")
+        return
+      }
+    }
+  }, [user, pathname, router, isSignedIn])
+
+  return null
 }

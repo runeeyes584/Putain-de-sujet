@@ -46,18 +46,28 @@ export default function SelectRole() {
         }),
       })
       if (!response.ok) throw new Error("Failed to update role")
+
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      await user.reload()
+      
       toast({
         title: "Success",
         description: `Bạn đã chọn: ${selectedRoles.join(", ")}`,
       })
-      if (selectedRoles.includes("admin")) {
+
+      const publicMetadata = user.publicMetadata || {}
+
+      if (publicMetadata.isAdmin) {
         router.push("/dashboard/admin")
-      } else if (selectedRoles.includes("seller")) {
+      } else if (publicMetadata.isSeller && publicMetadata.isBuyer) {
+        router.push("/dashboard")
+      } else if (publicMetadata.isSeller) {
         router.push("/dashboard/user")
-      } else if (selectedRoles.includes("buyer")) {
+      } else if (publicMetadata.isBuyer) {
         router.push("/dashboard/buyer")
       } else {
-        router.push("/")
+        router.push("/dashboard")
       }
     } catch (error) {
       toast({

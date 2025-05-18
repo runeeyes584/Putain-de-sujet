@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
 import { BarChart, Bell, Briefcase, Camera, ChevronLeft, ChevronRight, Code, Database, Heart, LayoutDashboard, MessageSquare, Music, Palette, PenTool, Search, ShoppingCart, Smile, Video } from "lucide-react"
 import Image from "next/image"
@@ -22,11 +21,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useRole } from "@/contexts/role-context"
 
 export function Navbar() {
-  const { role, clearRole } = useRole()
-  const { isSignedIn, isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser()
   const pathname = usePathname()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
@@ -41,6 +38,9 @@ export function Navbar() {
   const [openMsg, setOpenMsg] = useState(false);
   const notifications: { title: string; time: string }[] = [] // Thay bằng dữ liệu thực tế nếu có
   const messages: { title: string; time: string }[] = [] // Thay bằng dữ liệu thực tế nếu có
+  const isAdmin = user?.publicMetadata?.isAdmin
+  const isSeller = user?.publicMetadata?.isSeller
+  const isBuyer = user?.publicMetadata?.isBuyer
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -109,20 +109,15 @@ export function Navbar() {
   }
 
   const handleLogout = () => {
-    clearRole()
+    // Không cần clear role nữa vì chúng ta chỉ dùng publicMetadata
   }
 
   const getDashboardLink = () => {
-    if (!user) return null
-    const publicMetadata = user.publicMetadata || {}
-    if (publicMetadata.isAdmin) return "/dashboard/admin"
-    if (publicMetadata.isSeller) return "/dashboard/user"
-    if (publicMetadata.isBuyer) return "/dashboard/buyer"
+    if (isAdmin) return "/dashboard/admin"
+    if (isSeller && isBuyer) return "/dashboard"
+    if (isSeller) return "/dashboard/user"
+    if (isBuyer) return "/dashboard/buyer"
     return "/dashboard"
-  }
-
-  const getDashboardTooltip = () => {
-    return "Dashboard"
   }
 
   useEffect(() => {
@@ -194,7 +189,7 @@ export function Navbar() {
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{getDashboardTooltip()}</p>
+                          <p>Dashboard</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
