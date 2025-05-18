@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { LogOut, User, Shield } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useUser } from "@clerk/nextjs"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,11 +15,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useRole } from "@/hooks/use-role"
 
 export function UserNav() {
   const router = useRouter()
-  const { role, clearRole } = useRole()
+  const { user } = useUser()
+
+  const isAdmin = user?.publicMetadata?.isAdmin
+  const isSeller = user?.publicMetadata?.isSeller
+  const isBuyer = user?.publicMetadata?.isBuyer
 
   return (
     <DropdownMenu>
@@ -35,7 +39,7 @@ export function UserNav() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel className="flex items-center gap-2">
-          {role === "admin" ? (
+          {isAdmin ? (
             <>
               <Shield className="h-4 w-4 text-blue-500" />
               <span>Admin Account</span>
@@ -49,7 +53,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {role === "admin" ? (
+        {isAdmin ? (
           <>
             <DropdownMenuItem>
               <Link href="/dashboard/admin" className="w-full">
@@ -117,7 +121,6 @@ export function UserNav() {
         <DropdownMenuItem>
           <button
             onClick={() => {
-              clearRole()
               router.push("/select-role")
             }}
             className="flex w-full items-center gap-2 text-red-500"

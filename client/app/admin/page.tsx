@@ -51,6 +51,18 @@ export default function AdminDashboardPage() {
             <p className="text-gray-600">Manage users, services, and orders</p>
           </div>
 
+          <div className="flex gap-4 mt-8">
+            <Link href="/admin/dashboard">
+              <Button variant="outline">Admin Dashboard</Button>
+            </Link>
+            <Link href="/admin/manage-gigs">
+              <Button variant="outline">Manage Services</Button>
+            </Link>
+            <Link href="/admin/manage-users">
+              <Button variant="outline">User Manager</Button>
+            </Link>
+          </div>
+
           <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="mb-6 grid w-full grid-cols-3">
               <TabsTrigger value="users">Users</TabsTrigger>

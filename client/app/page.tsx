@@ -408,7 +408,7 @@ export default function Home() {
       playsInline
       className="absolute top-0 left-0 w-full h-full object-cover z-0"
     >
-      <source src="/banner/video-banner.mp4" type="video/mp4" />
+      <source src="https://player.cloudinary.com/embed/?cloud_name=dkfjtkhe9&public_id=video-banner_zjqq2d&profile=cld-looping" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
 
@@ -441,6 +441,9 @@ export default function Home() {
                   </Button>
                   <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
                     <Link href="/admin/manage-gigs">Manage Services</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
+                    <Link href="/admin/manage-users">User Manager</Link>
                   </Button>
                 </>
               ) : (

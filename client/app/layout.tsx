@@ -7,7 +7,6 @@ import "./globals.css"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { CurrencyProvider } from "@/context/currency-context"
-import { RoleProvider } from "@/contexts/role-context"
 import { RoleCheck } from "@/components/role-check"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -27,14 +26,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className} suppressHydrationWarning>
-          <RoleProvider>
-            <CurrencyProvider>
-              <RoleCheck />
-              <Navbar />
-                {children}
-              <Footer />
-            </CurrencyProvider>
-          </RoleProvider>
+          <CurrencyProvider>
+            <RoleCheck />
+            <Navbar />
+            {children}
+            <Footer />
+          </CurrencyProvider>
         </body>
       </html>
     </ClerkProvider>

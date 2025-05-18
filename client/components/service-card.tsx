@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Heart } from "lucide-react"
 import { PriceDisplay } from "@/components/price-display"
-import { useRole } from "@/contexts/role-context"
+import { useUser } from "@clerk/nextjs"
 import { useSavedGigs } from "@/hooks/use-saved-gigs"
 
 interface ServiceCardProps {
@@ -29,9 +29,12 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ service, showCategory = false }: ServiceCardProps) {
-  const { role } = useRole()
+  const { user } = useUser()
+  const isAdmin = user?.publicMetadata?.isAdmin
+  const isSeller = user?.publicMetadata?.isSeller
+  const isBuyer = user?.publicMetadata?.isBuyer
   const { isSaved, isLoading, error, toggleSave } = useSavedGigs(service.id)
-  const isLoggedIn = role !== null
+  const isLoggedIn = !!user
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.preventDefault()
