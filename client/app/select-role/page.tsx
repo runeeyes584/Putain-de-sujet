@@ -50,7 +50,15 @@ export default function SelectRole() {
         title: "Success",
         description: `Bạn đã chọn: ${selectedRoles.join(", ")}`,
       })
-      window.location.href = "/"
+      if (selectedRoles.includes("admin")) {
+        router.push("/dashboard/admin")
+      } else if (selectedRoles.includes("seller")) {
+        router.push("/dashboard/user")
+      } else if (selectedRoles.includes("buyer")) {
+        router.push("/dashboard/buyer")
+      } else {
+        router.push("/")
+      }
     } catch (error) {
       toast({
         title: "Error",

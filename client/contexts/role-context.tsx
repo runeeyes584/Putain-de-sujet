@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
+import { useUser } from "@clerk/nextjs"
 
 type Role = "user" | "admin" | null
 
@@ -18,6 +19,7 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined)
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [role, setRoleState] = useState<Role>(null)
   const router = useRouter()
+  const { user, isSignedIn } = useUser()
 
   // Initialize role from localStorage on component mount
   useEffect(() => {
@@ -26,6 +28,17 @@ export function RoleProvider({ children }: { children: ReactNode }) {
       setRoleState(storedRole)
     }
   }, [])
+
+  // Đồng bộ role với Clerk metadata
+  useEffect(() => {
+    if (!isSignedIn || !user) return;
+    const metadata = user.publicMetadata || {};
+    if (metadata.isAdmin) {
+      setRole("admin")
+    } else if (metadata.isSeller || metadata.isBuyer) {
+      setRole("user")
+    }
+  }, [isSignedIn, user])
 
   // Set role in state and localStorage
   const setRole = (newRole: Role) => {

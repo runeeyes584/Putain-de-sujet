@@ -115,7 +115,7 @@ export function Navbar() {
   const getDashboardLink = () => {
     if (!user) return null
     const publicMetadata = user.publicMetadata || {}
-    if (publicMetadata.isAdmin) return "/admin"
+    if (publicMetadata.isAdmin) return "/dashboard/admin"
     if (publicMetadata.isSeller) return "/dashboard/user"
     if (publicMetadata.isBuyer) return "/dashboard/buyer"
     return "/dashboard"
