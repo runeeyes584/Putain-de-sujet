@@ -55,8 +55,7 @@ export function ServiceCard({ service, showCategory = false }: ServiceCardProps)
           {/* Save button - chuyển sang góc trên bên trái */}
           <button
             onClick={handleSaveClick}
-            className={`absolute right-3 top-3 rounded-full p-1.5 z-10 transition-all duration-200
-              transition-colors transition-[color,background,fill]
+            className={`absolute right-3 top-3 rounded-full p-1.5 z-10 transition-[color,background,fill] duration-200
               ${
                 isSaved
                   ? "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400"
@@ -66,7 +65,7 @@ export function ServiceCard({ service, showCategory = false }: ServiceCardProps)
             tabIndex={0}
             disabled={isLoading}
           >
-            <Heart className={`h-5 w-5 transition-all duration-200 transition-colors transition-[color,fill] ${isSaved ? "fill-current" : ""}`} />
+            <Heart className={`h-5 w-5 transition-[color,fill] duration-200 ${isSaved ? "fill-current" : ""}`} />
           </button>
           {/* Badges */}
           {service.badges && service.badges.length > 0 && (

@@ -434,7 +434,7 @@ export default function Home() {
             </p>
             )}
             <div className="flex flex-wrap gap-4">
-              {user?.firstName ? (
+              {user?.publicMetadata?.isAdmin ? (
                 <>
                   <Button asChild size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
                     <Link href="/dashboard/admin">Admin Dashboard</Link>
