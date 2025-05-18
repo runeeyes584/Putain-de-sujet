@@ -429,7 +429,7 @@ export default function Home() {
                 <AnimatedWords
                   text={user?.firstName ? "Manage your platform and help users find the perfect services." : "Find the perfect services for your projects or continue where you left off."}
                 />
-              </p>
+            </p>
             )}
             <div className="flex flex-wrap gap-4">
               {user?.firstName ? (

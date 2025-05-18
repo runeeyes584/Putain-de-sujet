@@ -128,15 +128,21 @@ export function Navbar() {
           </div>
 
           <div className="flex flex-1 items-center gap-4">
-            <form onSubmit={handleSearch} className="relative flex-1 mx-4">
+            <form onSubmit={handleSearch} className="relative flex-1 mx-4 flex">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 text-base rounded-full bg-background placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-emerald-500"
+                className="w-full h-10 pl-10 pr-12 text-base rounded-md bg-background placeholder:text-muted-foreground/60 focus-visible:ring-2 focus-visible:ring-emerald-500 border"
               />
+              <Button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 bg-emerald-500 text-white hover:bg-emerald-600 rounded-md"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
             </form>
             <div className="flex items-center gap-2 shrink-0">
               {!isLoaded ? (
