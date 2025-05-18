@@ -44,7 +44,20 @@ export function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+      const currentParams = new URLSearchParams(window.location.search)
+      currentParams.set("q", searchQuery.trim())
+
+      // Lấy loại tiền tệ từ localStorage hoặc mặc định USD
+      let currency = "USD"
+      if (typeof window !== 'undefined') {
+        currency = localStorage.getItem("currency") || "USD"
+      }
+
+      // Nếu không có minPrice/maxPrice thì thêm mặc định theo loại tiền tệ
+      if (!currentParams.get("minPrice")) currentParams.set("minPrice", currency === "VND" ? "0" : "10")
+      if (!currentParams.get("maxPrice")) currentParams.set("maxPrice", currency === "VND" ? "30000000" : "500")
+
+      router.push(`/search?${currentParams.toString()}`)
     }
   }
 

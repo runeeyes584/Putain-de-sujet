@@ -52,19 +52,21 @@ export function ServiceCard({ service, showCategory = false }: ServiceCardProps)
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          {/* Save button */}
+          {/* Save button - chuyển sang góc trên bên trái */}
           <button
             onClick={handleSaveClick}
-            className={`absolute right-3 top-3 rounded-full p-1.5 transition-colors ${
-              isSaved
-                ? "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400"
-                : "bg-white/80 text-gray-600 hover:text-red-500 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:text-red-400"
-            }`}
+            className={`absolute right-3 top-3 rounded-full p-1.5 z-10 transition-all duration-200
+              transition-colors transition-[color,background,fill]
+              ${
+                isSaved
+                  ? "bg-red-50 text-red-500 dark:bg-red-900/20 dark:text-red-400"
+                  : "bg-white/80 text-gray-600 hover:text-red-500 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:text-red-400"
+              }`}
             aria-label={isSaved ? "Remove from saved" : "Save gig"}
             tabIndex={0}
             disabled={isLoading}
           >
-            <Heart className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
+            <Heart className={`h-5 w-5 transition-all duration-200 transition-colors transition-[color,fill] ${isSaved ? "fill-current" : ""}`} />
           </button>
           {/* Badges */}
           {service.badges && service.badges.length > 0 && (

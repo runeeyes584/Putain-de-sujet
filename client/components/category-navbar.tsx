@@ -22,6 +22,20 @@ export function CategoryNavbar() {
     return currentCategory === category
   }
 
+  // Create a URL with the current parameters but changing the category
+  const createCategoryUrl = (categorySlug: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("category", categorySlug)
+    return `/search?${params.toString()}`
+  }
+
+  // Create a URL for "All Categories" that preserves other parameters
+  const createAllCategoriesUrl = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("category")
+    return `/search?${params.toString()}`
+  }
+
   // Categories from the previous dropdown
   const categories = [
     { name: "Graphics & Design", slug: "graphics-design" },
@@ -38,7 +52,7 @@ export function CategoryNavbar() {
           {categories.map((category) => (
             <Link
               key={category.slug}
-              href={`/search?category=${category.slug}`}
+              href={createCategoryUrl(category.slug)}
               className={`
                 text-sm font-medium whitespace-nowrap
                 transition-colors duration-200
@@ -54,7 +68,7 @@ export function CategoryNavbar() {
             </Link>
           ))}
           <Link
-            href="/search"
+            href={createAllCategoriesUrl()}
             className={`
               text-sm font-medium whitespace-nowrap
               transition-colors duration-200

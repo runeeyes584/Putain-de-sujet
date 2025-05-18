@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, TrendingUp, Clock, Heart, Search } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -381,6 +382,7 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [showSub, setShowSub] = useState(false);
+  const router = useRouter()
 
   // Set isClient to true once component mounts
   useEffect(() => {
@@ -390,7 +392,7 @@ export default function Home() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
     }
   }
 
@@ -481,13 +483,14 @@ export default function Home() {
                 <div className="mt-4 flex flex-wrap gap-2 text-sm">
                   <span>Popular:</span>
                   {["Website Design", "Logo Design", "WordPress", "Voice Over", "Video Editing"].map((term, index) => (
-                    <Link
+                    <Button
                       key={index}
-                      href={`/search?q=${encodeURIComponent(term)}`}
-                      className="rounded-full border border-white/30 px-3 py-1 hover:bg-white/10"
+                      variant="link"
+                      className="rounded-full border border-white/30 px-3 py-1 text-white hover:bg-white/10 hover:text-white font-normal"
+                      onClick={() => router.push(`/search?q=${encodeURIComponent(term)}`)}
                     >
                       {term}
-                    </Link>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -517,47 +520,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {recentlyViewed.map((service) => (
-                  <div
-                    key={service.id}
-                    className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
-                  >
-                    <Link href={`/gigs/${service.id}`}>
-                      <div className="relative aspect-video overflow-hidden">
-                        <Image
-                          src={service.image || "/placeholder.svg"}
-                          alt={service.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute bottom-2 right-2 rounded-full bg-black/70 px-2 py-1 text-xs text-white">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{service.viewedAt}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Image
-                            src={service.seller.avatar || "/placeholder.svg"}
-                            alt={service.seller.name}
-                            width={24}
-                            height={24}
-                            className="rounded-full"
-                          />
-                          <span className="text-sm font-medium dark:text-gray-200">{service.seller.name}</span>
-                        </div>
-
-                        <h3 className="mb-2 line-clamp-2 text-sm font-medium dark:text-white">{service.title}</h3>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Starting at</div>
-                          <PriceDisplay priceUSD={service.price} className="text-base font-semibold dark:text-white" />
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+                  <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
             </div>
@@ -580,57 +543,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {recommendedServices.map((service) => (
-                  <Link key={service.id} href={`/gigs/${service.id}`}>
-                    <div className="group overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-                      <div className="relative aspect-video overflow-hidden">
-                        <Image
-                          src={service.image || "/placeholder.svg"}
-                          alt={service.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        {service.badges && service.badges.includes("pro") && (
-                          <div className="absolute left-2 top-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                            PRO
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-4">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Image
-                            src={service.seller.avatar || "/placeholder.svg"}
-                            alt={service.seller.name}
-                            width={24}
-                            height={24}
-                            className="rounded-full"
-                          />
-                          <span className="text-sm font-medium dark:text-gray-200">{service.seller.name}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">| {service.seller.level}</span>
-                        </div>
-
-                        <h3 className="mb-2 line-clamp-2 text-sm font-medium dark:text-white">{service.title}</h3>
-
-                        <div className="mb-2 flex items-center gap-1">
-                          <svg
-                            className="h-4 w-4 text-yellow-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <span className="text-sm font-medium dark:text-gray-200">{service.rating.toFixed(1)}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">({service.reviewCount})</span>
-                        </div>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Starting at</div>
-                          <PriceDisplay priceUSD={service.price} className="text-base font-semibold dark:text-white" />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
             </div>
@@ -653,58 +566,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {trendingServices.map((service) => (
-                  <Link key={service.id} href={`/gigs/${service.id}`}>
-                    <div className="group overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-                      <div className="relative aspect-video overflow-hidden">
-                        <Image
-                          src={service.image || "/placeholder.svg"}
-                          alt={service.title}
-                          fill
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute left-2 top-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                          <div className="flex items-center gap-1">
-                            <TrendingUp className="h-3 w-3" />
-                            <span>Trending</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Image
-                            src={service.seller.avatar || "/placeholder.svg"}
-                            alt={service.seller.name}
-                            width={24}
-                            height={24}
-                            className="rounded-full"
-                          />
-                          <span className="text-sm font-medium dark:text-gray-200">{service.seller.name}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">| {service.seller.level}</span>
-                        </div>
-
-                        <h3 className="mb-2 line-clamp-2 text-sm font-medium dark:text-white">{service.title}</h3>
-
-                        <div className="mb-2 flex items-center gap-1">
-                          <svg
-                            className="h-4 w-4 text-yellow-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          <span className="text-sm font-medium dark:text-gray-200">{service.rating.toFixed(1)}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">({service.reviewCount})</span>
-                        </div>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Starting at</div>
-                          <PriceDisplay priceUSD={service.price} className="text-base font-semibold dark:text-white" />
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
             </div>
@@ -729,58 +591,7 @@ export default function Home() {
                 {popularServices
                   .filter((service) => service.isSaved)
                   .map((service) => (
-                    <Link key={service.id} href={`/gigs/${service.id}`}>
-                      <div className="group overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-                        <div className="relative aspect-video overflow-hidden">
-                          <Image
-                            src={service.image || "/placeholder.svg"}
-                            alt={service.title}
-                            fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                          <div className="absolute right-2 top-2 rounded-full bg-red-50 p-1.5 text-red-500 dark:bg-red-900/20 dark:text-red-400">
-                            <Heart className="h-4 w-4 fill-current" />
-                          </div>
-                        </div>
-
-                        <div className="p-4">
-                          <div className="mb-2 flex items-center gap-2">
-                            <Image
-                              src={service.seller.avatar || "/placeholder.svg"}
-                              alt={service.seller.name}
-                              width={24}
-                              height={24}
-                              className="rounded-full"
-                            />
-                            <span className="text-sm font-medium dark:text-gray-200">{service.seller.name}</span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">| {service.seller.level}</span>
-                          </div>
-
-                          <h3 className="mb-2 line-clamp-2 text-sm font-medium dark:text-white">{service.title}</h3>
-
-                          <div className="mb-2 flex items-center gap-1">
-                            <svg
-                              className="h-4 w-4 text-yellow-400"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span className="text-sm font-medium dark:text-gray-200">{service.rating.toFixed(1)}</span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">({service.reviewCount})</span>
-                          </div>
-
-                          <div className="mt-3 flex items-center justify-between">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">Starting at</div>
-                            <PriceDisplay
-                              priceUSD={service.price}
-                              className="text-base font-semibold dark:text-white"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                    <ServiceCard key={service.id} service={service} />
                   ))}
               </div>
             </div>

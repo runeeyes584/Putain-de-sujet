@@ -175,6 +175,7 @@ export default function SearchPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { currency, convertPrice, getCurrencySymbol } = useCurrency()
+  const [isLoading, setIsLoading] = useState(false)
 
   // Get initial values from URL parameters
   const initialQuery = searchParams.get("q") || ""
@@ -212,7 +213,73 @@ export default function SearchPage() {
     setIsClient(true)
   }, [])
 
-  // Apply filters and update results
+  // Handle search form submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Set loading state
+    setIsLoading(true)
+    
+    // Reset current page when searching
+    setCurrentPage(1)
+    
+    // Update URL with search parameters (will trigger the searchParams effect)
+    updateSearchParams()
+  }
+
+  // Update URL with all current filters
+  const updateSearchParams = () => {
+    // Lấy các tham số URL hiện tại
+    const params = new URLSearchParams(searchParams.toString())
+    
+    // Cập nhật các tham số theo trạng thái hiện tại
+    if (searchQuery) params.set("q", searchQuery)
+    else params.delete("q")
+    
+    if (selectedCategory) params.set("category", selectedCategory)
+    else params.delete("category")
+    
+    params.set("minPrice", priceRange[0].toString())
+    params.set("maxPrice", priceRange[1].toString())
+    
+    if (deliveryTime.length > 0) params.set("delivery", deliveryTime.join(","))
+    else params.delete("delivery")
+    
+    if (sellerLevels.length > 0) params.set("seller", sellerLevels.join(","))
+    else params.delete("seller")
+    
+    params.set("sort", sortOption)
+
+    router.push(`/search?${params.toString()}`)
+  }
+  
+  // Listen for URL search params changes
+  useEffect(() => {
+    setIsLoading(true)  // Set loading state when params change
+    
+    const query = searchParams.get("q") || ""
+    const category = searchParams.get("category") || ""
+    const minPrice = searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : 10
+    const maxPrice = searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : 500
+    const delivery = searchParams.get("delivery") ? searchParams.get("delivery")!.split(",").map(Number) : []
+    const seller = searchParams.get("seller") ? searchParams.get("seller")!.split(",") : []
+    const sort = searchParams.get("sort") || "relevance"
+
+    // Update state with URL params
+    setSearchQuery(query)
+    setSelectedCategory(category)
+    setPriceRange([minPrice, maxPrice])
+    setMinPrice(minPrice.toString())
+    setMaxPrice(maxPrice.toString())
+    setDeliveryTime(delivery)
+    setSellerLevels(seller)
+    setSortOption(sort)
+
+    // We'll let the filters effect handle the actual filtering
+    // after state is updated
+  }, [searchParams])
+
+  // Apply filters and update results whenever filter state changes
   useEffect(() => {
     let results = [...allServices]
 
@@ -278,7 +345,8 @@ export default function SearchPage() {
 
     setFilteredResults(results)
     setCurrentPage(1) // Reset to first page when filters change
-  }, [searchQuery, selectedCategory, priceRange, deliveryTime, sellerLevels, sortOption])
+    setIsLoading(false) // End loading state
+  }, [searchQuery, selectedCategory, priceRange, deliveryTime, sellerLevels, sortOption, currency])
 
   // Khi currency thay đổi, cập nhật lại range nếu cần
   useEffect(() => {
@@ -286,28 +354,6 @@ export default function SearchPage() {
     setMinPrice(minCurrency.toString())
     setMaxPrice(maxCurrency.toString())
   }, [currency])
-
-  // Handle search form submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Update URL with search parameters
-    updateSearchParams()
-  }
-
-  // Update URL with all current filters
-  const updateSearchParams = () => {
-    const params = new URLSearchParams()
-    if (searchQuery) params.set("q", searchQuery)
-    if (selectedCategory) params.set("category", selectedCategory)
-    params.set("minPrice", priceRange[0].toString())
-    params.set("maxPrice", priceRange[1].toString())
-    if (deliveryTime.length > 0) params.set("delivery", deliveryTime.join(","))
-    if (sellerLevels.length > 0) params.set("seller", sellerLevels.join(","))
-    params.set("sort", sortOption)
-
-    router.push(`/search?${params.toString()}`)
-  }
 
   // Handle category checkbox change
   const handleCategoryChange = (categorySlug: string, checked: boolean) => {
@@ -395,7 +441,7 @@ export default function SearchPage() {
     // Update URL with remaining filters
     setTimeout(updateSearchParams, 0)
   }
-
+  
   // Apply filters button click
   const applyFilters = () => {
     updateSearchParams()
@@ -773,8 +819,13 @@ export default function SearchPage() {
             </div>
           )}
 
-          {/* Results Grid */}
-          {paginatedResults.length > 0 ? (
+          {/* Results Grid or Loading State */}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center">
+              <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-emerald-500"></div>
+              <p className="text-gray-500 dark:text-gray-400">Loading results...</p>
+            </div>
+          ) : paginatedResults.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {paginatedResults.map((service) => (
                 <ServiceCard
