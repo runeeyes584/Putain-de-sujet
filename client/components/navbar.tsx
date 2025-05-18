@@ -30,6 +30,7 @@ export function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
   const categoriesRef = useRef<HTMLDivElement>(null)
   const [showLeftButton, setShowLeftButton] = useState(false)
   const [showRightButton, setShowRightButton] = useState(false)
@@ -124,6 +125,21 @@ export function Navbar() {
     return "Dashboard"
   }
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:8800/api/categories')
+        const data = await response.json()
+        if (data.success && data.categories) {
+          setCategories(data.categories)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
   // Don't show navbar on role selection page
   if (pathname === "/select-role") {
     return null
@@ -136,7 +152,7 @@ export function Navbar() {
           <div className="mr-4 flex">
             <Link href="/" prefetch className="mr-6 flex items-center space-x-2">
               <Image src="/logo.png" alt="Logo" width={32} height={32} />
-              <span className="hidden font-bold sm:inline-block">JopNOVA</span>
+              <span className="hidden font-bold sm:inline-block">JobNOVA</span>
             </Link>
           </div>
 
@@ -325,76 +341,16 @@ export function Navbar() {
                 ref={categoriesRef}
                 className="flex items-center space-x-4 overflow-x-auto py-2 whitespace-nowrap touch-pan-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
               >
-                <Link
-                  href="/search?category=graphics-design"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Palette className="h-4 w-4" />
-                  <span>Graphics & Design</span>
-                </Link>
-                <Link
-                  href="/search?category=digital-marketing"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <BarChart className="h-4 w-4" />
-                  <span>Digital Marketing</span>
-                </Link>
-                <Link
-                  href="/search?category=writing-translation"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <PenTool className="h-4 w-4" />
-                  <span>Writing & Translation</span>
-                </Link>
-                <Link
-                  href="/search?category=video-animation"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Video className="h-4 w-4" />
-                  <span>Video & Animation</span>
-                </Link>
-                <Link
-                  href="/search?category=music-audio"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Music className="h-4 w-4" />
-                  <span>Music & Audio</span>
-                </Link>
-                <Link
-                  href="/search?category=programming-tech"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Code className="h-4 w-4" />
-                  <span>Programming & Tech</span>
-                </Link>
-                <Link
-                  href="/search?category=business"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Briefcase className="h-4 w-4" />
-                  <span>Business</span>
-                </Link>
-                <Link
-                  href="/search?category=lifestyle"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Smile className="h-4 w-4" />
-                  <span>Lifestyle</span>
-                </Link>
-                <Link
-                  href="/search?category=data"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Database className="h-4 w-4" />
-                  <span>Data</span>
-                </Link>
-                <Link
-                  href="/search?category=photography"
-                  className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
-                >
-                  <Camera className="h-4 w-4" />
-                  <span>Photography</span>
-                </Link>
+                {categories.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/search?category=${category.id}`}
+                    className="flex items-center space-x-1 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors whitespace-nowrap"
+                  >
+                    <Palette className="h-4 w-4" />
+                    <span>{category.name}</span>
+                  </Link>
+                ))}
               </nav>
             </div>
             {showRightButton && (
