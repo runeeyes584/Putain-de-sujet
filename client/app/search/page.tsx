@@ -19,17 +19,6 @@ import { useCurrency } from "@/context/currency-context"
 import { PriceDisplay } from "@/components/price-display"
 
 // Sample data
-const categories = [
-  { id: 1, name: "Graphics & Design", slug: "graphics-design" },
-  { id: 2, name: "Digital Marketing", slug: "digital-marketing" },
-  { id: 3, name: "Writing & Translation", slug: "writing-translation" },
-  { id: 4, name: "Video & Animation", slug: "video-animation" },
-  { id: 5, name: "Music & Audio", slug: "music-audio" },
-  { id: 6, name: "Programming & Tech", slug: "programming-tech" },
-  { id: 7, name: "Business", slug: "business" },
-  { id: 8, name: "Lifestyle", slug: "lifestyle" },
-]
-
 const allServices = [
   {
     id: 1,
@@ -199,6 +188,24 @@ export default function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isClient, setIsClient] = useState(false)
   const resultsPerPage = 6
+
+  // Thêm state và fetch API
+  const [categories, setCategories] = useState<{ id: number; name: string; slug?: string }[]>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:8800/api/categories')
+        const data = await response.json()
+        if (data.success && data.categories) {
+          setCategories(data.categories)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   // Giá trị min/max gốc theo USD
   let minCurrency = Math.round(convertPrice(10))
@@ -454,6 +461,14 @@ export default function SearchPage() {
   // Get currency symbol
   const currencySymbol = isClient ? getCurrencySymbol() : "$"
 
+  // Thêm hàm getCategoryName vào trong component để dùng được biến categories
+  function getCategoryName(slugOrId: string): string {
+    const found = categories.find(
+      (cat: { id: number; name: string; slug?: string }) => (cat.slug && cat.slug === slugOrId) || String(cat.id) === slugOrId
+    )
+    return found ? found.name : slugOrId
+  }
+
   return (
     <main className="container mx-auto px-4 py-10">
       <div className="mb-8 flex items-center">
@@ -516,8 +531,8 @@ export default function SearchPage() {
                       <div key={cat.id} className="flex items-center space-x-3">
                         <Checkbox
                           id={`category-${cat.id}`}
-                          checked={selectedCategory === cat.slug}
-                          onCheckedChange={(checked) => handleCategoryChange(cat.slug, checked as boolean)}
+                          checked={selectedCategory === (cat.slug || String(cat.id))}
+                          onCheckedChange={(checked) => handleCategoryChange(cat.slug || String(cat.id), checked as boolean)}
                         />
                         <label
                           htmlFor={`category-${cat.id}`}
@@ -923,9 +938,4 @@ export default function SearchPage() {
       </div>
     </main>
   )
-}
-
-function getCategoryName(slug: string): string {
-  const category = categories.find((cat) => cat.slug === slug)
-  return category ? category.name : slug
 }
