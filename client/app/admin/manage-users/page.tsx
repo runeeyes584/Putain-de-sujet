@@ -105,9 +105,9 @@ export default function ManageUsers() {
     }
   }
 
-  const handleBanUser = async (userId: number) => {
+  const handleBanUser = async (clerkId: string) => {
     try {
-      const response = await fetch(`http://localhost:8800/api/users/${userId}/ban`, {
+      const response = await fetch(`http://localhost:8800/api/users/${clerkId}/ban`, {
         method: "PATCH",
       });
       if (response.ok) {
@@ -249,7 +249,7 @@ export default function ManageUsers() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className={user.is_banned ? "text-green-500" : "text-red-500"}
-                            onClick={() => handleBanUser(user.id)}
+                            onClick={() => handleBanUser(user.clerk_id)}
                           >
                             {user.is_banned ? (
                               <>

@@ -140,7 +140,7 @@ export function Navbar() {
     if (isLoaded && isSignedIn) {
       if (isAdmin && pathname !== "/admin/admin-dashboard" && pathname !== "/select-role") {
         router.push("/admin/admin-dashboard");
-      } else if ((isSeller || isBuyer || (isSeller && isBuyer)) && pathname === "/sign-in" as string) {
+      } else if ((isSeller || isBuyer || (isSeller && isBuyer)) && pathname === "/sign-in") {
         router.push("/");
       }
     }
@@ -314,7 +314,7 @@ export function Navbar() {
                     </Tooltip>
                   </TooltipProvider>
 
-                  <UserButton afterSignOutUrl="/" />
+                  <UserButton />
                 </>
               ) : (
                 <div className="flex items-center gap-2">
