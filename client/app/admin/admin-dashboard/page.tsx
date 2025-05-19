@@ -117,9 +117,14 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
 
 export default function AdminDashboardPage() {
   const [isClient, setIsClient] = useState(false)
+  const [stats, setStats] = useState({ totalUsers: 0, totalGigs: 0 })
 
   useEffect(() => {
     setIsClient(true)
+    fetch("http://localhost:8800/api/dashboard/summary")
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch(() => setStats({ totalUsers: 0, totalGigs: 0 }))
   }, [])
 
   if (!isClient) {
@@ -140,9 +145,9 @@ export default function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockStats.totalUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-500">+{mockStats.userGrowth}%</span> from last month
+              <span className="text-green-500">+12.5%</span> from last month
             </p>
           </CardContent>
         </Card>
@@ -152,7 +157,7 @@ export default function AdminDashboardPage() {
             <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockStats.totalGigs.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{stats.totalGigs.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-500">+5.2%</span> from last month
             </p>

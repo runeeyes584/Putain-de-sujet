@@ -46,6 +46,11 @@ const User = (sequelize) =>
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
+      is_banned: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       tableName: "user_account",

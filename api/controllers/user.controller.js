@@ -117,5 +117,21 @@ export const handleClerkWebhook = async (req, res) => {
   }
 };
 
+export const banUser = async (req, res, next) => {
+  try {
+    const user = await models.User.findOne({ where: { clerk_id: req.params.clerk_id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    await user.update({ is_banned: !user.is_banned });
+    res.status(200).json({
+      message: user.is_banned ? "User banned successfully" : "User unbanned successfully",
+      is_banned: user.is_banned
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 

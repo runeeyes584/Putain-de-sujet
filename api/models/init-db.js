@@ -48,6 +48,7 @@ async function initDb() {
         registration_date: "2025-01-01",
         is_seller: true,
         user_role: "employer",
+        is_banned: false,
       },
       {
         clerk_id: "user_2",
@@ -55,6 +56,7 @@ async function initDb() {
         registration_date: "2025-01-02",
         is_seller: true,
         user_role: "employer",
+        is_banned: false,
       },
       {
         clerk_id: "user_3",
@@ -62,6 +64,7 @@ async function initDb() {
         registration_date: "2025-01-03",
         is_seller: false,
         user_role: "seeker",
+        is_banned: false,
       },
     ]);
 

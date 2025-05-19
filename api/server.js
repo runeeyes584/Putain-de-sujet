@@ -1,4 +1,3 @@
-
 import { Clerk } from "@clerk/clerk-sdk-node";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -35,6 +34,7 @@ import skillsRoute from "./routes/skills.route.js";
 import userRoute from "./routes/user.route.js";
 import userSearchHistoryRoute from "./routes/userSearchHistory.route.js";
 import messageSocketHandler from "./socket/messageSocket.js";
+import dashboardRoute from "./routes/dashboard.route.js";
 // .env
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -94,6 +94,7 @@ app.use("/api/seekerSkills", seekerSkillRoute);
 app.use("/api/skills", skillsRoute);
 app.use("/api/userSearchHistory", userSearchHistoryRoute);
 app.use("/api/cloudinary", cloudinaryRoute);
+app.use("/api/dashboard", dashboardRoute);
 
 // Error middleware
 app.use((err, req, res, next) => {

@@ -15,153 +15,138 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Search, Filter, MoreHorizontal, Shield, User, Star, CheckCircle } from "lucide-react"
+import { Search, Filter, MoreHorizontal, Shield, User, Star, CheckCircle, Eye, Trash2, Ban, CheckCircle2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useToast } from "@/components/ui/use-toast"
 
-// Mock data
-const mockUsers = [
-  {
-    id: "user-1",
-    name: "John Doe",
-    username: "johndoe",
-    email: "john@example.com",
-    role: "seller",
-    status: "active",
-    joinDate: "2025-01-15",
-    verified: true,
-    rating: 4.8,
-    completedOrders: 124,
-  },
-  {
-    id: "user-2",
-    name: "Jane Smith",
-    username: "janesmith",
-    email: "jane@example.com",
-    role: "buyer",
-    status: "active",
-    joinDate: "2025-02-20",
-    verified: false,
-    rating: 0,
-    completedOrders: 0,
-  },
-  {
-    id: "user-3",
-    name: "Robert Johnson",
-    username: "robertj",
-    email: "robert@example.com",
-    role: "seller",
-    status: "suspended",
-    joinDate: "2025-03-10",
-    verified: true,
-    rating: 3.2,
-    completedOrders: 18,
-  },
-  {
-    id: "user-4",
-    name: "Emily Davis",
-    username: "emilyd",
-    email: "emily@example.com",
-    role: "seller",
-    status: "active",
-    joinDate: "2025-01-05",
-    verified: true,
-    rating: 4.9,
-    completedOrders: 87,
-  },
-  {
-    id: "user-5",
-    name: "Michael Wilson",
-    username: "michaelw",
-    email: "michael@example.com",
-    role: "buyer",
-    status: "active",
-    joinDate: "2025-02-28",
-    verified: false,
-    rating: 0,
-    completedOrders: 0,
-  },
-  {
-    id: "user-6",
-    name: "Sarah Brown",
-    username: "sarahb",
-    email: "sarah@example.com",
-    role: "seller",
-    status: "active",
-    joinDate: "2025-03-15",
-    verified: true,
-    rating: 4.5,
-    completedOrders: 42,
-  },
-  {
-    id: "user-7",
-    name: "David Lee",
-    username: "davidl",
-    email: "david@example.com",
-    role: "admin",
-    status: "active",
-    joinDate: "2025-01-01",
-    verified: true,
-    rating: 0,
-    completedOrders: 0,
-  },
-]
+interface User {
+  id: number;
+  clerk_id: string;
+  user_roles: string[];
+  country: string;
+  description: string | null;
+  registration_date: string;
+  date_of_birth: string | null;
+  gender: number;
+  contact_number: string | null;
+  is_banned: boolean;
+}
 
-export default function ManageUsersPage() {
-  const [isClient, setIsClient] = useState(false)
+export default function ManageUsers() {
+  const [users, setUsers] = useState<User[]>([])
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const { toast } = useToast()
 
-  // Filtered users based on search, role, and status
-  const filteredUsers = mockUsers.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesRole = roleFilter === "all" || user.role === roleFilter
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter
-
-    return matchesSearch && matchesRole && matchesStatus
-  })
-
-  // Mock action handlers
-  const handleVerifyUser = (userId: string) => {
-    toast({
-      title: "User Verified",
-      description: `User ID: ${userId} has been verified successfully.`,
-    })
-  }
-
-  const handleSuspendUser = (userId: string) => {
-    toast({
-      title: "User Suspended",
-      description: `User ID: ${userId} has been suspended.`,
-      variant: "destructive",
-    })
-  }
-
-  const handleActivateUser = (userId: string) => {
-    toast({
-      title: "User Activated",
-      description: `User ID: ${userId} has been activated successfully.`,
-    })
-  }
-
-  const handlePromoteToAdmin = (userId: string) => {
-    toast({
-      title: "User Promoted",
-      description: `User ID: ${userId} has been promoted to admin.`,
-    })
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://localhost:8800/api/users")
+      const data = await response.json()
+      setUsers(data)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch users",
+        variant: "destructive",
+      })
+    }
   }
 
   useEffect(() => {
-    setIsClient(true)
+    fetchUsers()
   }, [])
 
-  if (!isClient) {
-    return null
+  const handleDelete = async (userId: number) => {
+    if (!confirm("Are you sure you want to delete this user?")) return
+
+    try {
+      const response = await fetch(`http://localhost:8800/api/users/${userId}`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "User deleted successfully",
+        })
+        fetchUsers() // Refresh the list
+      } else {
+        throw new Error("Failed to delete user")
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive",
+      })
+    }
   }
+
+  const handleViewDetails = async (userId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8800/api/users/${userId}`)
+      const user = await response.json()
+      setSelectedUser(user)
+      setIsViewDialogOpen(true)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch user details",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleBanUser = async (userId: number) => {
+    try {
+      const response = await fetch(`http://localhost:8800/api/users/${userId}/ban`, {
+        method: "PATCH",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: "Success",
+          description: data.message,
+        });
+        fetchUsers(); // Refresh lại danh sách
+      } else {
+        throw new Error("Failed to update user status");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getGenderText = (gender: number) => {
+    switch (gender) {
+      case 1:
+        return "Male"
+      case 2:
+        return "Female"
+      default:
+        return "Other"
+    }
+  }
+
+  // Filter users based on search and role
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = user.clerk_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.country.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = roleFilter === "all" || user.user_roles.includes(roleFilter)
+    return matchesSearch && matchesRole
+  })
 
   return (
     <div className="container px-4 py-8">
@@ -180,7 +165,7 @@ export default function ManageUsersPage() {
             <div className="relative flex-1">
               <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search by name, username, or email..."
+                placeholder="Search by ID or country..."
                 className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -194,19 +179,9 @@ export default function ManageUsersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Roles</SelectItem>
-                  <SelectItem value="buyer">Buyers</SelectItem>
-                  <SelectItem value="seller">Sellers</SelectItem>
                   <SelectItem value="admin">Admins</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
+                  <SelectItem value="employer">Employers</SelectItem>
+                  <SelectItem value="seeker">Seekers</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -215,11 +190,11 @@ export default function ManageUsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
+                <TableHead>User ID</TableHead>
+                <TableHead>Roles</TableHead>
+                <TableHead>Country</TableHead>
+                <TableHead>Registration Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Verified</TableHead>
-                <TableHead>Join Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -228,58 +203,35 @@ export default function ManageUsersPage() {
                 filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{user.name}</div>
-                        <div className="text-sm text-muted-foreground">@{user.username}</div>
-                        <div className="text-xs text-muted-foreground">{user.email}</div>
+                      <div className="font-medium">{user.clerk_id}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1 items-center">
+                        {user.user_roles.map((role) => (
+                          <Badge
+                            key={role}
+                            variant={role === "admin" ? "default" : role === "employer" ? "outline" : "secondary"}
+                          >
+                            {role === "admin" ? (
+                              <span>Admin</span>
+                            ) : role === "employer" ? (
+                              <span>Employer</span>
+                            ) : (
+                              <span>Seeker</span>
+                            )}
+                          </Badge>
+                        ))}
                       </div>
                     </TableCell>
+                    <TableCell>{user.country}</TableCell>
+                    <TableCell>{new Date(user.registration_date).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant={user.role === "admin" ? "default" : user.role === "seller" ? "outline" : "secondary"}
-                      >
-                        {user.role === "admin" ? (
-                          <div className="flex items-center gap-1">
-                            <Shield className="h-3 w-3" />
-                            <span>Admin</span>
-                          </div>
-                        ) : user.role === "seller" ? (
-                          <div className="flex items-center gap-1">
-                            <Star className="h-3 w-3" />
-                            <span>Seller</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
-                            <span>Buyer</span>
-                          </div>
-                        )}
-                      </Badge>
-                      {user.role === "seller" && (
-                        <div className="mt-1 text-xs">
-                          <span className="font-medium">{user.rating}</span>
-                          <span className="text-muted-foreground"> • {user.completedOrders} orders</span>
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={user.status === "active" ? "success" : "destructive"}>
-                        {user.status === "active" ? "Active" : "Suspended"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {user.verified ? (
-                        <Badge variant="outline" className="text-green-500 border-green-200 bg-green-50">
-                          <CheckCircle className="mr-1 h-3 w-3" />
-                          Verified
-                        </Badge>
+                      {user.is_banned ? (
+                        <span className="px-2 py-0.5 rounded bg-red-500 text-white text-xs font-semibold">Banned</span>
                       ) : (
-                        <Badge variant="outline" className="text-amber-500 border-amber-200 bg-amber-50">
-                          Unverified
-                        </Badge>
+                        <span className="px-2 py-0.5 rounded bg-green-500 text-white text-xs font-semibold">Active</span>
                       )}
                     </TableCell>
-                    <TableCell>{new Date(user.joinDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -291,26 +243,33 @@ export default function ManageUsersPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => (window.location.href = `/admin/users/${user.id}`)}>
+                          <DropdownMenuItem onClick={() => handleViewDetails(user.id)}>
+                            <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          {!user.verified && (
-                            <DropdownMenuItem onClick={() => handleVerifyUser(user.id)}>Verify User</DropdownMenuItem>
-                          )}
-                          {user.status === "active" ? (
-                            <DropdownMenuItem className="text-red-500" onClick={() => handleSuspendUser(user.id)}>
-                              Suspend User
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => handleActivateUser(user.id)}>
-                              Activate User
-                            </DropdownMenuItem>
-                          )}
-                          {user.role !== "admin" && (
-                            <DropdownMenuItem onClick={() => handlePromoteToAdmin(user.id)}>
-                              Promote to Admin
-                            </DropdownMenuItem>
-                          )}
+                          <DropdownMenuItem
+                            className={user.is_banned ? "text-green-500" : "text-red-500"}
+                            onClick={() => handleBanUser(user.id)}
+                          >
+                            {user.is_banned ? (
+                              <>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Unban User
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="mr-2 h-4 w-4" />
+                                Ban User
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete User
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -327,6 +286,56 @@ export default function ManageUsersPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>User Details</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Clerk ID</h3>
+                <p className="mt-1">{selectedUser.clerk_id}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Roles</h3>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {selectedUser.user_roles.map((role) => (
+                    <Badge key={role} variant="outline">
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Country</h3>
+                <p className="mt-1">{selectedUser.country}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Registration Date</h3>
+                <p className="mt-1">{new Date(selectedUser.registration_date).toLocaleDateString()}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Date of Birth</h3>
+                <p className="mt-1">{selectedUser.date_of_birth ? new Date(selectedUser.date_of_birth).toLocaleDateString() : "Not provided"}</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm text-muted-foreground">Gender</h3>
+                <p className="mt-1">{getGenderText(selectedUser.gender)}</p>
+              </div>
+              <div className="col-span-2">
+                <h3 className="font-semibold text-sm text-muted-foreground">Description</h3>
+                <p className="mt-1">{selectedUser.description || "No description"}</p>
+              </div>
+              <div className="col-span-2">
+                <h3 className="font-semibold text-sm text-muted-foreground">Contact Number</h3>
+                <p className="mt-1">{selectedUser.contact_number || "Not provided"}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -14,6 +14,7 @@ import { useUser } from "@clerk/nextjs"
 import { PriceDisplay } from "@/components/price-display"
 import { SearchAutocomplete } from "@/components/search-autocomplete"
 import { ServiceCard } from "@/components/service-card"
+import { BannedOverlay } from "@/components/BannedOverlay"
 
 // Sample categories
 const categories = [
@@ -383,11 +384,26 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("")
   const [showSub, setShowSub] = useState(false);
   const router = useRouter()
+  const [isBanned, setIsBanned] = useState(false);
 
-  // Set isClient to true once component mounts
   useEffect(() => {
     setIsClient(true)
   }, [])
+
+  useEffect(() => {
+    // Reset trạng thái khi user thay đổi
+    setIsBanned(false);
+    // Nếu đã đăng nhập, fetch trạng thái banned từ API
+    if (isSignedIn && user?.id) {
+      fetch(`http://localhost:8800/api/users/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && typeof data.is_banned !== 'undefined') setIsBanned(!!data.is_banned);
+          else setIsBanned(false);
+        })
+        .catch(() => setIsBanned(false));
+    }
+  }, [isSignedIn, user?.id]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -396,70 +412,74 @@ export default function Home() {
     }
   }
 
+  if (isClient && isSignedIn && isBanned) {
+    return <BannedOverlay />;
+  }
+
   return (
     <main>
-  {/* Hero Section */}
-  <section className="relative h-[500px] text-white overflow-hidden">
-    {/* Video Background */}
-    <video
-      autoPlay
-      loop
-      muted
-      playsInline
-      className="absolute top-0 left-0 w-full h-full object-cover z-0"
-    >
-      <source src="https://res.cloudinary.com/kaleidoscop3/video/upload/v1747545962/video-banner_zjqq2d.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+      {/* Hero Section */}
+      <section className="relative h-[500px] text-white overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        >
+          <source src="https://res.cloudinary.com/kaleidoscop3/video/upload/v1747545962/video-banner_zjqq2d.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
 
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black bg-opacity-50 z-10" />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-10" />
 
-    {/* Nội dung chữ */}
-    <div className="container mx-auto px-4 relative z-20 h-full flex items-center">
-      <div className="max-w-3xl">
-        {(isClient && isSignedIn) ? (
-          <div>
-            <h1 className="mb-2 text-4xl font-bold md:text-5xl">
-              <AnimatedWords
-                text={`Welcome back, ${(user?.firstName || '') + (user?.lastName ? ' ' + user.lastName : '') || user?.username || 'User'}!`}
-                onDone={() => setShowSub(true)}
-              />
-            </h1>
-            {showSub && (
-              <p className="mb-8 text-base md:text-lg opacity-80 text-gray-200">
-                <AnimatedWords
-                  text={user?.firstName ? "Manage your platform and help users find the perfect services." : "Find the perfect services for your projects or continue where you left off."}
-                />
-            </p>
-            )}
-            <div className="flex flex-wrap gap-4">
-              {user?.publicMetadata?.isAdmin ? (
-                <>
-                  <Button asChild size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
-                    <Link href="/dashboard/admin">Admin Dashboard</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
-                    <Link href="/admin/manage-gigs">Manage Services</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
-                    <Link href="/admin/manage-users">User Manager</Link>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <SearchAutocomplete
-                    placeholder="What service are you looking for today?"
-                    className="w-full max-w-xl text-black"
+        {/* Nội dung chữ */}
+        <div className="container mx-auto px-4 relative z-20 h-full flex items-center">
+          <div className="max-w-3xl">
+            {(isClient && isSignedIn) ? (
+              <div>
+                <h1 className="mb-2 text-4xl font-bold md:text-5xl">
+                  <AnimatedWords
+                    text={`Welcome back, ${(user?.firstName || '') + (user?.lastName ? ' ' + user.lastName : '') || user?.username || 'User'}!`}
+                    onDone={() => setShowSub(true)}
                   />
-                  <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
-                    <Link href="/saved">View Saved Services</Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        ) : (
+                </h1>
+                {showSub && (
+                  <p className="mb-8 text-base md:text-lg opacity-80 text-gray-200">
+                    <AnimatedWords
+                      text={user?.firstName ? "Manage your platform and help users find the perfect services." : "Find the perfect services for your projects or continue where you left off."}
+                    />
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-4">
+                  {user?.publicMetadata?.isAdmin ? (
+                    <>
+                      <Button asChild size="lg" className="bg-white text-emerald-600 hover:bg-gray-100">
+                        <Link href="/dashboard/admin">Admin Dashboard</Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
+                        <Link href="/admin/manage-gigs">Manage Services</Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
+                        <Link href="/admin/manage-users">User Manager</Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <SearchAutocomplete
+                        placeholder="What service are you looking for today?"
+                        className="w-full max-w-xl text-black"
+                      />
+                      <Button asChild size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
+                        <Link href="/saved">View Saved Services</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
               // Logged out hero content
               <div>
                 <h1 className="mb-2 text-4xl font-bold md:text-5xl">
