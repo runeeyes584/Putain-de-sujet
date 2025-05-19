@@ -137,10 +137,14 @@ export function Navbar() {
 
   // Tự động push đến /admin nếu vừa đăng nhập và là admin, không ở /admin
   useEffect(() => {
-    if (isLoaded && isSignedIn && isAdmin && pathname !== "/admin/admin-dashboard") {
-      router.push("/admin/admin-dashboard");
+    if (isLoaded && isSignedIn) {
+      if (isAdmin && pathname !== "/admin/admin-dashboard" && pathname !== "/select-role") {
+        router.push("/admin/admin-dashboard");
+      } else if ((isSeller || isBuyer || (isSeller && isBuyer)) && pathname === "/sign-in" as string) {
+        router.push("/");
+      }
     }
-  }, [isLoaded, isSignedIn, isAdmin, pathname, router]);
+  }, [isLoaded, isSignedIn, isAdmin, isSeller, isBuyer, pathname, router]);
 
   // Don't show navbar on role selection page
   if (pathname === "/select-role") {
