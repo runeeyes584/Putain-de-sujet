@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +13,20 @@ import { Checkbox } from "@/components/ui/checkbox"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Giả lập xác thực: nếu email là 'admin' thì role là admin
+    const user = { role: email === 'admin' ? 'admin' : 'user' };
+    if (user.role === 'admin') {
+      router.push('/admin');
+    } else {
+      router.push('/');
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12">
@@ -30,10 +45,10 @@ export default function LoginPage() {
           <p className="mt-2 text-gray-600">Welcome back to our platform</p>
         </div>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleLogin}>
           <div className="space-y-2">
             <Label htmlFor="email">Email or Username</Label>
-            <Input id="email" placeholder="john.doe@example.com" required />
+            <Input id="email" placeholder="john.doe@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -43,7 +58,7 @@ export default function LoginPage() {
               </Link>
             </div>
             <div className="relative">
-              <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" required />
+              <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" required value={password} onChange={e => setPassword(e.target.value)} />
               <Button
                 type="button"
                 variant="ghost"

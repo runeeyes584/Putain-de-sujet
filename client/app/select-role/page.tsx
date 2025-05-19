@@ -59,7 +59,7 @@ export default function SelectRole() {
       const publicMetadata = user.publicMetadata || {}
 
       if (publicMetadata.isAdmin) {
-        router.push("/dashboard/admin")
+        router.push("../admin/admin-dashboard")
       } else if (publicMetadata.isSeller && publicMetadata.isBuyer) {
         router.push("/dashboard")
       } else if (publicMetadata.isSeller) {

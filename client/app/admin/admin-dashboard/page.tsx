@@ -1,26 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AlertTriangle, CheckCircle, Clock, DollarSign, ShoppingBag, Users, XCircle } from "lucide-react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Users, ShoppingBag, AlertTriangle, DollarSign, CheckCircle, XCircle, Clock } from "lucide-react"
 
 // Mock data
 const mockStats = {
@@ -131,17 +131,6 @@ export default function AdminDashboardPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground">Quản lý hệ thống và người dùng</p>
-        <div className="flex gap-4 mt-8">
-          <Link href="/dashboard/admin">
-            <Button variant="outline">Admin Dashboard</Button>
-          </Link>
-          <Link href="/admin/manage-gigs">
-            <Button variant="outline">Manage Services</Button>
-          </Link>
-          <Link href="/admin/manage-users">
-            <Button variant="outline">User Manager</Button>
-          </Link>
-        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

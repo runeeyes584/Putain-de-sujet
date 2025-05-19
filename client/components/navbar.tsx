@@ -113,7 +113,7 @@ export function Navbar() {
   }
 
   const getDashboardLink = () => {
-    if (isAdmin) return "/dashboard/admin"
+    if (isAdmin) return "../admin/admin-dashboard"
     if (isSeller && isBuyer) return "/dashboard"
     if (isSeller) return "/dashboard/user"
     if (isBuyer) return "/dashboard/buyer"
@@ -134,6 +134,13 @@ export function Navbar() {
     }
     fetchCategories()
   }, [])
+
+  // Tự động push đến /admin nếu vừa đăng nhập và là admin, không ở /admin
+  useEffect(() => {
+    if (isLoaded && isSignedIn && isAdmin && pathname !== "/admin/admin-dashboard") {
+      router.push("/admin/admin-dashboard");
+    }
+  }, [isLoaded, isSignedIn, isAdmin, pathname, router]);
 
   // Don't show navbar on role selection page
   if (pathname === "/select-role") {
