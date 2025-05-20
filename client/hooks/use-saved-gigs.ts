@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/nextjs";
+import { useCallback, useEffect, useState } from "react";
 
 // Lưu trạng thái gig đã lưu cho từng user
 const savedStateCache = new Map<string, boolean>();
