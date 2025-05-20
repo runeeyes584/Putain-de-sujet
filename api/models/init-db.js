@@ -120,6 +120,7 @@ async function initDb() {
         order_status: "completed",
         total_price: 200.0,
         order_date: "2025-01-04",
+        requirements: "Website for e-commerce, responsive, SEO ready",
       },
       {
         gig_id: gigs[2].id,
@@ -128,6 +129,7 @@ async function initDb() {
         order_status: "pending",
         total_price: 100.0,
         order_date: "2025-01-05",
+        requirements: "Logo design for new brand, modern style",
       },
     ]);
 
