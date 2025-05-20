@@ -1,50 +1,133 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from "@clerk/nextjs";
+import { useCallback, useEffect, useState } from "react";
 
-// Hook cho từng gig: kiểm tra và toggle trạng thái đã lưu qua API
+// Lưu trạng thái gig đã lưu cho từng user
+const savedStateCache = new Map<string, boolean>();
+const listeners: Map<string, Set<() => void>> = new Map();
+
+const getKey = (clerkId: string, gigId: string | number) => `${clerkId}-${gigId}`;
+const getAllKey = (clerkId: string) => `__ALL__-${clerkId}`;
+
 export function useSavedGigs(gigId: string | number) {
-  const [isSaved, setIsSaved] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { getToken, userId } = useAuth();
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const notifyChange = () => {
+    const key = getKey(userId || "", gigId);
+    const allKey = getAllKey(userId || "");
+
+    listeners.get(key)?.forEach(fn => fn());
+    listeners.get(allKey)?.forEach(fn => fn());
+  };
 
   useEffect(() => {
-    setIsLoading(true)
-    fetch("http://localhost:8800/api/savedGigs", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => {
-        setIsSaved((data.savedGigs || []).some((g: any) => g.id == gigId))
-        setIsLoading(false)
-      })
-      .catch(err => {
-        setError('Failed to load saved state')
-        setIsLoading(false)
-      })
-  }, [gigId])
+    if (!userId) return;
+    const key = getKey(userId, gigId);
+
+    const update = () => {
+      setIsSaved(savedStateCache.get(key) || false);
+    };
+
+    if (!listeners.has(key)) listeners.set(key, new Set());
+    listeners.get(key)!.add(update);
+
+    return () => {
+      listeners.get(key)?.delete(update);
+    };
+  }, [userId, gigId]);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        setIsLoading(true);
+        const token = await getToken();
+
+        const res = await fetch("http://localhost:8800/api/savedGigs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          const saved = !!(data.savedGigs || []).find((g: any) => g.id == gigId);
+          const key = getKey(userId || "", gigId);
+          savedStateCache.set(key, saved);
+          setIsSaved(saved);
+        } else {
+          setError("Failed to fetch saved status");
+        }
+      } catch {
+        setError("Failed to fetch saved status");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStatus();
+  }, [gigId, getToken, userId]);
 
   const toggleSave = useCallback(async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
+      const token = await getToken();
       const res = await fetch(`http://localhost:8800/api/savedGigs/${gigId}`, {
         method: isSaved ? "DELETE" : "POST",
-        credentials: "include"
-      })
-      if (res.ok) setIsSaved(!isSaved)
-      else setError("Failed to update saved state")
-    } catch (err) {
-      setError('Failed to update saved state')
-    }
-    setIsLoading(false)
-  }, [gigId, isSaved])
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  return { isSaved, isLoading, error, toggleSave }
+      if (res.ok) {
+        const key = getKey(userId || "", gigId);
+        savedStateCache.set(key, !isSaved);
+        setIsSaved(!isSaved);
+        notifyChange(); // 🔥 gọi toàn bộ nơi khác cập nhật
+      } else {
+        setError("Failed to toggle save");
+      }
+    } catch {
+      setError("Failed to toggle save");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [gigId, isSaved, getToken, userId]);
+
+  return { isSaved, isLoading, error, toggleSave };
 }
 
-// Hook lấy toàn bộ gig đã lưu cho trang Saved hoặc Home
 export function useAllSavedGigs() {
+  const { getToken, userId } = useAuth();
   const [savedGigs, setSavedGigs] = useState<any[]>([]);
+
+  const fetchAll = useCallback(async () => {
+    const token = await getToken();
+    const res = await fetch("http://localhost:8800/api/savedGigs", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setSavedGigs(data.savedGigs || []);
+    } else {
+      console.error("Failed to fetch saved gigs:", data);
+    }
+  }, [getToken]);
+
   useEffect(() => {
-    fetch("http://localhost:8800/api/savedGigs", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setSavedGigs(data.savedGigs || []));
-  }, []);
+    fetchAll();
+
+    const key = getAllKey(userId || "");
+    const update = () => fetchAll();
+
+    if (!listeners.has(key)) listeners.set(key, new Set());
+    listeners.get(key)!.add(update);
+
+    return () => {
+      listeners.get(key)?.delete(update);
+    };
+  }, [fetchAll, userId]);
+
   return savedGigs;
-} 
+}

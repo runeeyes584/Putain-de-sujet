@@ -41,6 +41,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import { useSavedGigs } from "@/hooks/use-saved-gigs"
+import { useUser } from "@clerk/nextjs"
 
 interface PageParams {
   id: string
@@ -48,28 +49,67 @@ interface PageParams {
 
 export default function GigDetailPage({ params }: { params: Promise<PageParams> }) {
   const resolvedParams = use(params)
-  const gig = sampleGig
   const router = useRouter()
-  const { isSaved, isLoading, error, toggleSave } = useSavedGigs(resolvedParams.id)
+  const gigId = resolvedParams.id
+  const { isSaved, isLoading, error, toggleSave } = useSavedGigs(gigId)
+  const { user, isSignedIn } = useUser();
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  // State for image gallery
+  // State for gig thật
+  const [gig, setGig] = useState<any>(null)
+  const [loadingGig, setLoadingGig] = useState(true)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-
-  // State for reviews
   const [reviewSort, setReviewSort] = useState("recent")
   const [reviewsToShow, setReviewsToShow] = useState(3)
-  const [filteredReviews, setFilteredReviews] = useState(gig.reviews)
-
-  // State for FAQ
+  const [filteredReviews, setFilteredReviews] = useState<any[]>([])
   const [expandedFAQs, setExpandedFAQs] = useState<number[]>([])
-
-  // State for package selection
   const [selectedPackage, setSelectedPackage] = useState("basic")
-
-  // Refs for scrolling
   const reviewsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setLoadingGig(true)
+    fetch(`http://localhost:8800/api/gigs/${gigId}`)
+      .then(res => res.json())
+      .then(data => setGig(data.gig))
+      .finally(() => setLoadingGig(false))
+  }, [gigId])
+
+  useEffect(() => {
+    // Fetch reviews from backend
+    fetch(`http://localhost:8800/api/reviews?gig_id=${gigId}`)
+      .then(res => res.json())
+      .then(async data => {
+        // Map reviewer_clerk_id sang user info nếu backend chưa trả về
+        // Giả sử backend trả về mảng reviews, mỗi review có reviewer_clerk_id
+        // Nếu backend đã trả về user info thì bỏ đoạn này
+        const reviewsWithUser = await Promise.all(
+          data.reviews.map(async (review: any) => {
+            // Nếu đã có review.user thì giữ nguyên
+            if (review.user) return review;
+            // Gọi API lấy user info
+            const userRes = await fetch(`http://localhost:8800/api/users/${review.reviewer_clerk_id}`);
+            const userData = await userRes.json();
+            return {
+              ...review,
+              user: {
+                name: userData.name || userData.username || "User",
+                avatar: userData.avatar || "/placeholder.svg",
+              },
+              date: formatTimeAgo(review.created_at),
+            };
+          })
+        );
+        setReviews(reviewsWithUser);
+      });
+  }, [gigId]);
+
+  // Nếu gig có reviews thật, dùng, không thì fallback []
+  useEffect(() => {
+    if (gig && gig.reviews) setFilteredReviews(gig.reviews)
+    else setFilteredReviews([])
+  }, [gig])
 
   // Handle image navigation
   const nextImage = () => {
@@ -125,6 +165,8 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
 
   // Handle review sorting
   useEffect(() => {
+    if (!gig || !gig.reviews) return;
+    
     let sorted = [...gig.reviews]
 
     switch (reviewSort) {
@@ -155,13 +197,57 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
     }
 
     setFilteredReviews(sorted)
-  }, [reviewSort, gig.reviews])
+  }, [reviewSort, gig])
 
-  // Handle review submission
-  const handleReviewSubmit = (data: { rating: number; comment: string }) => {
-    // In a real app, you would call an API to submit the review
-    alert(`Review submitted with rating ${data.rating} and comment: ${data.comment}`)
+  // Hàm format thời gian (ví dụ: 2 weeks ago)
+  function formatTimeAgo(dateString: string) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+    if (diff < 2592000) return `${Math.floor(diff / 604800)} weeks ago`;
+    return `${Math.floor(diff / 2592000)} months ago`;
   }
+
+  // Xử lý submit review
+  const handleReviewSubmit = async (data: { rating: number; comment: string }) => {
+    if (!isSignedIn || !user) {
+      alert("You must be signed in to leave a review.");
+      return;
+    }
+    // Gửi review lên backend
+    const res = await fetch("http://localhost:8800/api/reviews", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        gig_id: gigId,
+        order_id: null, // Nếu có order_id thì truyền vào
+        reviewer_clerk_id: user.id,
+        rating: data.rating,
+        comment: data.comment,
+      }),
+    });
+    const result = await res.json();
+    if (result.success) {
+      // Mapping dữ liệu mới vào danh sách reviews để hiển thị ngay
+      setReviews([
+        {
+          ...result.review,
+          user: {
+            name: user.firstName + (user.lastName ? " " + user.lastName : "") || user.username || "User",
+            avatar: user.imageUrl || "/placeholder.svg",
+          },
+          date: formatTimeAgo(result.review.created_at),
+        },
+        ...reviews,
+      ]);
+    } else {
+      alert("Có lỗi xảy ra khi gửi review!");
+    }
+  };
 
   // Handle scroll to reviews
   const scrollToReviews = () => {
@@ -176,6 +262,74 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
   // Handle contact seller
   const handleContactSeller = () => {
     router.push(`/messages/${gig.seller.username}`)
+  }
+
+  if (loadingGig) return <div>Loading...</div>
+  if (!gig) return <div>Gig not found</div>
+
+  // Fallback cho các trường chưa có trong gig thật
+  const images = gig.images || (gig.gig_image ? [gig.gig_image] : ["/placeholder.svg"])
+  const seller = gig.seller || {
+    name: gig.seller_clerk_id || "AlexDesigns",
+    username: gig.seller_clerk_id || "alexdesigns",
+    avatar: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    level: "Level 2 Seller",
+    bio: "I'm a professional graphic designer with over 5 years of experience specializing in logo design and brand identity. I've worked with clients from various industries, from startups to established businesses, helping them create memorable visual identities."
+  }
+  const faqs = gig.faqs || [
+    {
+      question: "How many revisions do I get?",
+      answer: "The number of revisions depends on the package you choose. Basic includes 2 revisions, Standard includes unlimited revisions, and Premium includes unlimited revisions plus priority support."
+    },
+    {
+      question: "What file formats will I receive?",
+      answer: "You'll receive your logo in multiple formats including PNG, JPG, SVG, and AI (for Standard and Premium packages). All packages include high-resolution files suitable for both print and digital use."
+    }
+  ]
+  const packages = gig.packages || {
+    basic: {
+      price: gig.starting_price || 25,
+      description: "1 professional logo design with 2 revisions",
+      deliveryTime: gig.delivery_time || "2",
+      features: [
+        "1 concept included",
+        "Logo transparency",
+        "Vector file (SVG)",
+        "High resolution files",
+        "2 revisions"
+      ]
+    },
+    standard: {
+      price: (gig.starting_price || 25) * 2,
+      description: "3 professional logo designs with unlimited revisions",
+      deliveryTime: (Number(gig.delivery_time) || 2) + 1,
+      features: [
+        "3 concepts included",
+        "Logo transparency",
+        "Vector file (SVG, EPS, AI)",
+        "High resolution files",
+        "Source file",
+        "Unlimited revisions",
+        "Social media kit"
+      ]
+    },
+    premium: {
+      price: (gig.starting_price || 25) * 4,
+      description: "5 professional logo designs with priority support",
+      deliveryTime: (Number(gig.delivery_time) || 2) + 3,
+      features: [
+        "5 concepts included",
+        "Logo transparency",
+        "Vector file (SVG, EPS, AI)",
+        "High resolution files",
+        "Source file",
+        "Unlimited revisions",
+        "Social media kit",
+        "Stationery designs",
+        "3D mockup",
+        "Priority support"
+      ]
+    }
   }
 
   return (
@@ -194,15 +348,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 <div className="flex items-center">
                   <span className="mx-2">/</span>
                   <Link href="/search" className="hover:text-emerald-600 transition-colors">
-                    Graphics & Design
-                  </Link>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <span className="mx-2">/</span>
-                  <Link href="/search" className="hover:text-emerald-600 transition-colors">
-                    Logo Design
+                    Search
                   </Link>
                 </div>
               </li>
@@ -225,8 +371,8 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
             <div className="mb-8 flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <div className="h-12 w-12 overflow-hidden rounded-full border border-gray-200">
                 <Image
-                  src={gig.seller.avatar || "/placeholder.svg"}
-                  alt={gig.seller.name}
+                  src={seller.avatar}
+                  alt={seller.name}
                   width={48}
                   height={48}
                   className="h-full w-full object-cover"
@@ -234,26 +380,26 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
               </div>
               <div className="flex-1">
                 <Link
-                  href={`/users/${gig.seller.username}`}
+                  href={`/users/${seller.username}`}
                   className="font-medium hover:text-emerald-600 transition-colors"
                 >
-                  {gig.seller.name}
+                  {seller.name}
                 </Link>
                 <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <UserBadge level={gig.seller.level} />
+                  <UserBadge level={seller.level} />
                   <span className="text-gray-300">|</span>
                   <div className="flex items-center">
                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="ml-1 font-medium">{gig.rating}</span>
+                    <span className="ml-1 font-medium">4.9</span>
                     <button
                       onClick={scrollToReviews}
                       className="ml-1 text-gray-600 hover:text-emerald-600 transition-colors"
                     >
-                      ({gig.reviewCount})
+                      (156)
                     </button>
                   </div>
                   <span className="text-gray-300">|</span>
-                  <span className="text-gray-600">{gig.orderQueue} orders</span>
+                  <span className="text-gray-600">3 orders</span>
                 </div>
               </div>
               <Button
@@ -270,7 +416,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
             <div className="mb-8">
               <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-100">
                 <Image
-                  src={gig.images[selectedImageIndex]}
+                  src={images[selectedImageIndex]}
                   alt={gig.title}
                   fill
                   className="object-cover"
@@ -290,7 +436,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 </button>
               </div>
               <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-                {gig.images.map((image, index) => (
+                {images.map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
@@ -316,7 +462,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
             <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold">About The Seller</h2>
               <div className="prose max-w-none">
-                <p>{gig.seller.bio}</p>
+                <p>{seller.bio}</p>
               </div>
             </div>
 
@@ -324,7 +470,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
             <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-semibold">FAQ</h2>
               <div className="space-y-4">
-                {gig.faqs.map((faq, index) => (
+                {faqs.map((faq: any, index: number) => (
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
                     <button
                       onClick={() => toggleFAQ(index)}
@@ -362,12 +508,12 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
               </div>
 
               <div className="space-y-6">
-                {filteredReviews.slice(0, reviewsToShow).map((review, index) => (
+                {reviews.slice(0, reviewsToShow).map((review: any, index: number) => (
                   <div key={index} className="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
                     <div className="mb-2 flex items-center gap-4">
                       <div className="h-10 w-10 overflow-hidden rounded-full">
                         <Image
-                          src={review.user.avatar || "/placeholder.svg"}
+                          src={review.user.avatar}
                           alt={review.user.name}
                           width={40}
                           height={40}
@@ -381,9 +527,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                                }`}
+                                className={`h-4 w-4 ${i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
                               />
                             ))}
                           </div>
@@ -397,7 +541,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 ))}
               </div>
 
-              {reviewsToShow < filteredReviews.length && (
+              {reviewsToShow < reviews.length && (
                 <Button
                   variant="outline"
                   className="mt-6 w-full hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
@@ -426,13 +570,13 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 <TabsContent value="basic" className="space-y-6">
                   <div className="flex items-baseline justify-between">
                     <h3 className="text-2xl font-bold">
-                      <PriceDisplay priceUSD={gig.packages.basic.price} />
+                      <PriceDisplay priceUSD={packages.basic.price} />
                     </h3>
-                    <span className="text-sm text-gray-500">{gig.packages.basic.deliveryTime} days delivery</span>
+                    <span className="text-sm text-gray-500">{packages.basic.deliveryTime} days delivery</span>
                   </div>
 
                   <ul className="space-y-3">
-                    {gig.packages.basic.features.map((feature, index) => (
+                    {packages.basic.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
                         <span>{feature}</span>
@@ -451,13 +595,13 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 <TabsContent value="standard" className="space-y-6">
                   <div className="flex items-baseline justify-between">
                     <h3 className="text-2xl font-bold">
-                      <PriceDisplay priceUSD={gig.packages.standard.price} />
+                      <PriceDisplay priceUSD={packages.standard.price} />
                     </h3>
-                    <span className="text-sm text-gray-500">{gig.packages.standard.deliveryTime} days delivery</span>
+                    <span className="text-sm text-gray-500">{packages.standard.deliveryTime} days delivery</span>
                   </div>
 
                   <ul className="space-y-3">
-                    {gig.packages.standard.features.map((feature, index) => (
+                    {packages.standard.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
                         <span>{feature}</span>
@@ -476,13 +620,13 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                 <TabsContent value="premium" className="space-y-6">
                   <div className="flex items-baseline justify-between">
                     <h3 className="text-2xl font-bold">
-                      <PriceDisplay priceUSD={gig.packages.premium.price} />
+                      <PriceDisplay priceUSD={packages.premium.price} />
                     </h3>
-                    <span className="text-sm text-gray-500">{gig.packages.premium.deliveryTime} days delivery</span>
+                    <span className="text-sm text-gray-500">{packages.premium.deliveryTime} days delivery</span>
                   </div>
 
                   <ul className="space-y-3">
-                    {gig.packages.premium.features.map((feature, index) => (
+                    {packages.premium.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
                         <span>{feature}</span>
@@ -574,7 +718,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
           </button>
           <div className="relative h-[80vh] w-[80vw]">
             <Image
-              src={gig.images[lightboxIndex]}
+              src={images[lightboxIndex]}
               alt={gig.title}
               fill
               className="object-contain"
@@ -584,175 +728,4 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
       )}
     </main>
   )
-}
-
-// Sample data
-const sampleGig = {
-  id: "1",
-  title: "I will design a professional logo for your business",
-  description:
-    "Are you looking for a professional logo that perfectly represents your brand? Look no further! I'll create a custom logo design that will make your business stand out from the competition.",
-  price: 25,
-  images: [
-    "https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1626785774625-ddcddc3445e9?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1636633762833-5d1658f1e29b?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1629429407759-01cd3d7cfb38?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  ],
-  seller: {
-    name: "AlexDesigns",
-    username: "alexdesigns",
-    avatar:
-      "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    level: "Level 2 Seller",
-    bio: "I'm a professional graphic designer with over 5 years of experience specializing in logo design and brand identity. I've worked with clients from various industries, from startups to established businesses, helping them create memorable visual identities.",
-  },
-  rating: 4.9,
-  reviewCount: 156,
-  orderQueue: 3,
-  benefits: [
-    "100% original designs - no templates",
-    "Unlimited revisions until you're satisfied",
-    "Quick turnaround time",
-    "High-resolution files in multiple formats",
-    "Full copyright ownership",
-    "Excellent communication throughout the process",
-    "Money-back guarantee if you're not satisfied",
-    "24/7 customer support",
-  ],
-  packages: {
-    basic: {
-      price: 25,
-      description: "1 professional logo design with 2 revisions",
-      deliveryTime: "2 days",
-      features: [
-        "1 concept included",
-        "Logo transparency",
-        "Vector file (SVG)",
-        "High resolution files",
-        "2 revisions",
-      ],
-    },
-    standard: {
-      price: 50,
-      description: "3 professional logo designs with unlimited revisions",
-      deliveryTime: "3 days",
-      features: [
-        "3 concepts included",
-        "Logo transparency",
-        "Vector file (SVG, EPS, AI)",
-        "High resolution files",
-        "Source file",
-        "Unlimited revisions",
-        "Social media kit",
-      ],
-    },
-    premium: {
-      price: 100,
-      description: "5 professional logo designs with priority support",
-      deliveryTime: "5 days",
-      features: [
-        "5 concepts included",
-        "Logo transparency",
-        "Vector file (SVG, EPS, AI)",
-        "High resolution files",
-        "Source file",
-        "Unlimited revisions",
-        "Social media kit",
-        "Stationery designs",
-        "3D mockup",
-        "Priority support",
-      ],
-    },
-  },
-  reviews: [
-    {
-      id: "1",
-      user: {
-        name: "John Smith",
-        avatar:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      },
-      rating: 5,
-      date: "2 weeks ago",
-      comment:
-        "Absolutely amazing work! Alex delivered exactly what I was looking for and was very responsive to my feedback. The logo perfectly captures my brand's essence. I highly recommend his services!",
-    },
-    {
-      id: "2",
-      user: {
-        name: "Sarah Johnson",
-        avatar:
-          "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      },
-      rating: 5,
-      date: "1 month ago",
-      comment:
-        "Working with Alex was a pleasure. He understood my vision from the start and delivered a stunning logo that exceeded my expectations. The process was smooth, and he was very patient with my revision requests.",
-    },
-    {
-      id: "3",
-      user: {
-        name: "Michael Chen",
-        avatar:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      },
-      rating: 4,
-      date: "2 months ago",
-      comment:
-        "Great experience overall. The logo looks professional and modern. I would have liked a bit more variety in the initial concepts, but the final result is excellent. Would use this service again.",
-    },
-    {
-      id: "4",
-      user: {
-        name: "Emily Rodriguez",
-        avatar:
-          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      },
-      rating: 5,
-      date: "3 months ago",
-      comment:
-        "I needed a logo for my new bakery business and Alex delivered beyond my expectations. The design is eye-catching, memorable, and perfectly represents my brand's personality. The communication was excellent throughout the process.",
-    },
-    {
-      id: "5",
-      user: {
-        name: "David Kim",
-        avatar:
-          "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=2648&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      },
-      rating: 3,
-      date: "4 months ago",
-      comment:
-        "The final logo is good, but it took more revisions than I expected to get there. Communication was sometimes slow, but Alex was willing to work until I was satisfied with the result.",
-    },
-  ],
-  faqs: [
-    {
-      question: "How many revisions do I get?",
-      answer:
-        "The number of revisions depends on the package you choose. Basic includes 2 revisions, Standard includes unlimited revisions, and Premium includes unlimited revisions plus priority support.",
-    },
-    {
-      question: "What file formats will I receive?",
-      answer:
-        "You'll receive your logo in multiple formats including PNG, JPG, SVG, and AI (for Standard and Premium packages). All packages include high-resolution files suitable for both print and digital use.",
-    },
-    {
-      question: "How long does the process take?",
-      answer:
-        "The delivery time depends on the package: Basic takes 2 days, Standard takes 3 days, and Premium takes 5 days. This includes the initial design and revision time.",
-    },
-    {
-      question: "Do I own the copyright to the logo?",
-      answer:
-        "Yes, once the order is completed and payment is finalized, you will own full copyright to the logo design. You're free to use it for any commercial or personal purposes.",
-    },
-    {
-      question: "Can you help with brand guidelines?",
-      answer:
-        "Yes, the Premium package includes basic brand guidelines. If you need more comprehensive guidelines, please contact me for a custom offer.",
-    },
-  ],
 }

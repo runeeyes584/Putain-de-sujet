@@ -2,6 +2,7 @@ import { models } from '../models/Sequelize-mysql.js';
 
 export const saveGig = async (req, res, next) => {
   const currentUserClerkId = req.auth?.userId;
+  console.log("🧾 Current clerk ID:", req.auth?.userId);
   const gigId = req.params.gigId;
 
   if (!currentUserClerkId) {

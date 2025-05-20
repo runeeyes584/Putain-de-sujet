@@ -5,12 +5,12 @@ import { Inter } from "next/font/google"
 import type React from "react"
 import "./globals.css"
 
+import { BannedOverlay } from "@/components/BannedOverlay"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
-import { CurrencyProvider } from "@/context/currency-context"
 import { RoleCheck } from "@/components/role-check"
+import { CurrencyProvider } from "@/context/currency-context"
 import { usePathname } from "next/navigation"
-import { BannedOverlay } from "@/components/BannedOverlay"
 import { useEffect, useState } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -24,7 +24,6 @@ function BannedLayout({ children }: { children: React.ReactNode }) {
       fetch(`http://localhost:8800/api/users/${user.id}`)
         .then(res => res.json())
         .then(data => {
-          console.log("[BannedLayout] User data for banned check:", data);
           setIsBanned(!!data.is_banned)
         })
         .catch(() => setIsBanned(false));
@@ -77,7 +76,7 @@ export default function RootLayout({
   const isAdminRoute = pathname.startsWith("/admin");
 
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en">
         <body className={inter.className} suppressHydrationWarning>
           <CurrencyProvider>

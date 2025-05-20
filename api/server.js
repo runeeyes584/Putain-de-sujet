@@ -123,7 +123,12 @@ app.use("/api/withdrawals", withdrawalRoute);
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";
-  return res.status(errorStatus).send(errorMessage);
+  console.error("Express error:", err);
+  res.status(errorStatus).json({
+    success: false,
+    message: errorMessage,
+    error: err.stack,
+  });
 });
 
 // Socket handler
