@@ -1,29 +1,32 @@
 import express from 'express';
 import {
-  createPaymentIntent,
+  cancelOrder,
   confirmOrder,
+  createPaymentIntent,
   getOrders,
   updateOrderStatus,
-  cancelOrder,
 } from '../controllers/order.controller.js';
+import { authenticateAndLoadUser } from '../middleware/getAuth.js';
 import requireAuth from '../middleware/requireAuth.js';
-import { isSeller, authenticateAndLoadUser } from '../middleware/getAuth.js';
 
 const router = express.Router();
 
+router.use(requireAuth);
+router.use(authenticateAndLoadUser);
+
 // Lấy danh sách order
-router.get('/:clerk_id', requireAuth, authenticateAndLoadUser, getOrders);
+router.get('/:clerk_id', getOrders);
 
 // Tạo payment intent
-router.post('/payment-intent', requireAuth, authenticateAndLoadUser, createPaymentIntent);
+router.post('/payment-intent', createPaymentIntent);
 
 // Xác nhận order
-router.post('/confirm', requireAuth, authenticateAndLoadUser, confirmOrder);
+router.post('/confirm', confirmOrder);
 
 // Cập nhật trạng thái đơn hàng
-router.put('/:id/status', requireAuth, authenticateAndLoadUser, updateOrderStatus);
+router.put('/:id/status', updateOrderStatus);
 
 // Hủy đơn hàng
-router.put('/:id/cancel', requireAuth, authenticateAndLoadUser, cancelOrder);
+router.put('/:id/cancel', cancelOrder);
 
 export default router;

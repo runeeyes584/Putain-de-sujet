@@ -48,7 +48,7 @@ export default function RootLayout({
   const isAdminRoute = pathname.startsWith("/admin");
 
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en">
         <body className={inter.className} suppressHydrationWarning>
           <CurrencyProvider>

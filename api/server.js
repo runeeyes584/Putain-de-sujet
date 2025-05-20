@@ -96,11 +96,16 @@ app.use("/api/userSearchHistory", userSearchHistoryRoute);
 app.use("/api/cloudinary", cloudinaryRoute);
 app.use("/api/dashboard", dashboardRoute);
 
-// Error middleware
+// Error middleware (luôn trả về JSON)
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";
-  return res.status(errorStatus).send(errorMessage);
+  console.error("Express error:", err);
+  res.status(errorStatus).json({
+    success: false,
+    message: errorMessage,
+    error: err.stack,
+  });
 });
 
 // Socket handler

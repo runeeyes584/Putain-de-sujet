@@ -1,43 +1,40 @@
 import { models } from "../models/Sequelize-mysql.js";
 
 export const authenticateAndLoadUser = async (req, res, next) => {
-  if (!req.auth || !req.auth.userId) {
-    console.error("authenticateAndLoadUser: req.auth.userId is missing. Clerk authentication might have failed.");
-    
-    // Optional fallback bằng token nếu cần
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      const err = new Error("Unauthorized: No Clerk user ID or token provided");
-      err.status = 401;
-      return next(err);
-    }
+  const clerkId = req.auth?.userId;
 
-    req.auth = { userId: token }; // Giả lập nếu token là userId
-    console.warn("Fallback: using token as Clerk user ID (not secure in production)");
+  // 🔍 Log thông tin token Clerk gửi lên
+  console.log("🔐 [getAuth] Clerk ID từ token:", clerkId);
+
+  if (!clerkId) {
+    console.error("❌ [getAuth] Thiếu Clerk ID (req.auth.userId)");
+    const err = new Error("Unauthorized: Clerk token missing.");
+    err.status = 401;
+    return next(err);
   }
-
-  const clerkId = req.auth.userId;
 
   try {
     const user = await models.User.findOne({
       where: { clerk_id: clerkId },
-      attributes: ['id', 'clerk_id', 'user_roles']
+      attributes: ["id", "clerk_id", "user_roles"],
     });
 
     if (!user) {
-      const err = new Error("User not found in application database.");
+      console.warn("⚠️ [getAuth] Không tìm thấy user trong DB với clerk_id:", clerkId);
+      const err = new Error("Unauthorized: User not found in database.");
       err.status = 401;
       return next(err);
     }
 
+    console.log("✅ [getAuth] User tìm thấy:", user.toJSON());
+
     req.user = user.toJSON();
-    console.log(`✅ User ${clerkId} authenticated with roles:`, req.user.user_roles);
     next();
   } catch (error) {
-    console.error("❌ Error loading user from DB:", error);
-    const err = new Error("Failed to load user from database.");
+    console.error("❌ [getAuth] Lỗi khi truy vấn DB:", error);
+    const err = new Error("Internal Server Error: Lỗi khi load user.");
     err.status = 500;
-    next(err);
+    return next(err);
   }
 };
 

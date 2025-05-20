@@ -18,147 +18,41 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useCurrency } from "@/context/currency-context"
 import { PriceDisplay } from "@/components/price-display"
 
-// Sample data
-const allServices = [
-  {
-    id: 1,
-    title: "I will design a professional logo for your business",
-    price: 25,
-    image: "/placeholder.svg?height=200&width=300",
+// Định nghĩa type cho gig thật
+interface Gig {
+  id: number;
+  seller_clerk_id: string;
+  category_id: number;
+  job_type_id: number;
+  title: string;
+  description: string;
+  starting_price: number;
+  delivery_time: number;
+  gig_image?: string;
+  city?: string;
+  country?: string;
+  status: string;
+}
+
+function mapGigToServiceCard(gig: Gig): any {
+  return {
+    id: gig.id,
+    title: gig.title,
+    price: gig.starting_price,
+    image: gig.gig_image || "/placeholder.svg",
     seller: {
-      name: "AlexDesigns",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Level 2 Seller",
-    },
-    rating: 4.9,
-    reviewCount: 156,
-    badges: ["top_rated"],
-    category: "graphics-design",
-    deliveryTime: 1,
-  },
-  {
-    id: 2,
-    title: "I will create a stunning website using WordPress",
-    price: 95,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "WebMaster",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Top Rated",
-    },
-    rating: 5.0,
-    reviewCount: 231,
-    category: "programming-tech",
-    deliveryTime: 3,
-  },
-  {
-    id: 3,
-    title: "I will write SEO-optimized content for your blog",
-    price: 45,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "ContentPro",
-      avatar: "/placeholder.svg?height=40&width=40",
+      name: gig.seller_clerk_id,
+      avatar: "/placeholder.svg",
       level: "Level 1 Seller",
     },
-    rating: 4.7,
-    reviewCount: 89,
-    category: "writing-translation",
-    deliveryTime: 2,
-  },
-  {
-    id: 4,
-    title: "I will create a professional video intro for your brand",
-    price: 75,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "VideoWizard",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Level 2 Seller",
-    },
-    rating: 4.8,
-    reviewCount: 124,
-    badges: ["new"],
-    category: "video-animation",
-    deliveryTime: 5,
-  },
-  {
-    id: 5,
-    title: "I will design social media graphics for your brand",
-    price: 35,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "SocialDesigner",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Level 1 Seller",
-    },
-    rating: 4.6,
-    reviewCount: 78,
-    category: "graphics-design",
-    deliveryTime: 2,
-  },
-  {
-    id: 6,
-    title: "I will create a custom WordPress theme for your website",
-    price: 120,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "ThemeDeveloper",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Top Rated",
-    },
-    rating: 4.9,
-    reviewCount: 112,
-    badges: ["pro"],
-    category: "programming-tech",
-    deliveryTime: 7,
-  },
-  {
-    id: 7,
-    title: "I will create a digital marketing strategy for your business",
-    price: 150,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "MarketingGuru",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Top Rated",
-    },
-    rating: 4.9,
-    reviewCount: 87,
-    category: "digital-marketing",
-    deliveryTime: 5,
-  },
-  {
-    id: 8,
-    title: "I will translate your content from English to Spanish",
-    price: 30,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "TranslationPro",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "Level 1 Seller",
-    },
-    rating: 4.7,
-    reviewCount: 65,
-    category: "writing-translation",
-    deliveryTime: 3,
-  },
-  {
-    id: 9,
-    title: "I will compose original music for your project",
-    price: 80,
-    image: "/placeholder.svg?height=200&width=300",
-    seller: {
-      name: "MusicMaestro",
-      avatar: "/placeholder.svg?height=40&width=40",
-      level: "New Seller",
-    },
-    rating: 4.5,
-    reviewCount: 23,
-    category: "music-audio",
-    deliveryTime: 4,
-  },
-]
+    rating: 5,
+    reviewCount: 0,
+    category: gig.category_id?.toString() || "",
+    deliveryTime: gig.delivery_time,
+    badges: [],
+    isSaved: false,
+  }
+}
 
 export default function SearchPage() {
   const router = useRouter()
@@ -184,13 +78,15 @@ export default function SearchPage() {
   const [deliveryTime, setDeliveryTime] = useState<number[]>(initialDeliveryTime)
   const [sellerLevels, setSellerLevels] = useState<string[]>(initialSellerLevels)
   const [sortOption, setSortOption] = useState(initialSortOption)
-  const [filteredResults, setFilteredResults] = useState(allServices)
+  const [filteredResults, setFilteredResults] = useState<any[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [isClient, setIsClient] = useState(false)
   const resultsPerPage = 6
 
   // Thêm state và fetch API
   const [categories, setCategories] = useState<{ id: number; name: string; slug?: string }[]>([])
+  const [gigs, setGigs] = useState<Gig[]>([])
+  const [loadingGigs, setLoadingGigs] = useState(true)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -205,6 +101,14 @@ export default function SearchPage() {
       }
     }
     fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    setLoadingGigs(true)
+    fetch("http://localhost:8800/api/gigs")
+      .then(res => res.json())
+      .then(data => setGigs(data.gigs || []))
+      .finally(() => setLoadingGigs(false))
   }, [])
 
   // Giá trị min/max gốc theo USD
@@ -288,27 +192,28 @@ export default function SearchPage() {
 
   // Apply filters and update results whenever filter state changes
   useEffect(() => {
-    let results = [...allServices]
+    setLoadingGigs(true)
+    let services = gigs.map(mapGigToServiceCard)
 
     // Filter by search query
     if (searchQuery) {
-      results = results.filter((service) => service.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      services = services.filter((service) => service.title.toLowerCase().includes(searchQuery.toLowerCase()))
     }
 
     // Filter by category
     if (selectedCategory) {
-      results = results.filter((service) => service.category === selectedCategory)
+      services = services.filter((service) => service.category === selectedCategory)
     }
 
     // Filter by price range
-    results = results.filter((service) => {
+    services = services.filter((service) => {
       const priceConverted = convertPrice(service.price)
       return priceConverted >= priceRange[0] && priceConverted <= priceRange[1]
     })
 
     // Filter by delivery time
     if (deliveryTime.length > 0) {
-      results = results.filter((service) => {
+      services = services.filter((service) => {
         if (deliveryTime.includes(1) && service.deliveryTime <= 1) return true
         if (deliveryTime.includes(3) && service.deliveryTime <= 3 && service.deliveryTime > 1) return true
         if (deliveryTime.includes(7) && service.deliveryTime <= 7 && service.deliveryTime > 3) return true
@@ -319,7 +224,7 @@ export default function SearchPage() {
 
     // Filter by seller level
     if (sellerLevels.length > 0) {
-      results = results.filter((service) => {
+      services = services.filter((service) => {
         const level = service.seller.level.toLowerCase()
         if (sellerLevels.includes("top_rated") && level.includes("top rated")) return true
         if (sellerLevels.includes("level_2") && level.includes("level 2")) return true
@@ -332,28 +237,28 @@ export default function SearchPage() {
     // Sort results
     switch (sortOption) {
       case "rating":
-        results.sort((a, b) => b.rating - a.rating)
+        services.sort((a, b) => b.rating - a.rating)
         break
       case "price_low":
-        results.sort((a, b) => a.price - b.price)
+        services.sort((a, b) => a.price - b.price)
         break
       case "price_high":
-        results.sort((a, b) => b.price - a.price)
+        services.sort((a, b) => b.price - a.price)
         break
       case "newest":
         // In a real app, you'd sort by date
         // Here we'll just reverse the array as a simple simulation
-        results.reverse()
+        services.reverse()
         break
       default:
         // relevance - keep default order
         break
     }
 
-    setFilteredResults(results)
+    setFilteredResults(services)
     setCurrentPage(1) // Reset to first page when filters change
     setIsLoading(false) // End loading state
-  }, [searchQuery, selectedCategory, priceRange, deliveryTime, sellerLevels, sortOption, currency])
+  }, [gigs, searchQuery, selectedCategory, priceRange, deliveryTime, sellerLevels, sortOption, currency])
 
   // Khi currency thay đổi, cập nhật lại range nếu cần
   useEffect(() => {
