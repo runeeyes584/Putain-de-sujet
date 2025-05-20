@@ -3,7 +3,8 @@ import {
   createGigView,
   deleteGigView,
   getAllGigViews,
-  getGigViewById
+  getGigViewById,
+  getGigViewCountsByGigId,
 } from '../controllers/gigViews.controller.js';
 import requireAuth from '../middleware/requireAuth.js';
 
@@ -13,6 +14,8 @@ const router = express.Router();
 router.get('/', getAllGigViews);
 // Lấy gig view theo id
 router.get('/:id', getGigViewById);
+// Lấy tổng số lượt xem theo gig_id
+router.get('/counts', requireAuth, getGigViewCountsByGigId);
 // Tạo gig view mới
 router.post('/', requireAuth, createGigView);
 // Cập nhật gig view
@@ -21,7 +24,5 @@ router.patch('/:id', requireAuth, (req, res) => {
 });
 // Xóa gig view
 router.delete('/:id', requireAuth, deleteGigView);
-
-
 
 export default router;
