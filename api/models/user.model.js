@@ -26,10 +26,10 @@ const User = (sequelize) =>
         allowNull: true,
       },
       user_roles: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: ["seeker"]
-      },
+  type: DataTypes.JSON,
+  allowNull: false,
+  defaultValue: ["seeker"]
+},
       date_of_birth: {
         type: DataTypes.DATEONLY,
         allowNull: true,

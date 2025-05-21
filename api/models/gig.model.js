@@ -33,14 +33,6 @@ const Gig = (sequelize) =>
           key: "id",
         },
       },
-      // tags: {
-      //   type: DataTypes.JSON,
-      //   allowNull: false,
-      //   defaultValue: [], // Đặt giá trị mặc định là mảng rỗng để tránh lỗi khi tags chưa được nhập
-      //   validate: {
-      //     isArray: (value) => Array.isArray(value), // Đảm bảo giá trị là mảng
-      //   },
-      // },
       title: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -61,10 +53,6 @@ const Gig = (sequelize) =>
         type: DataTypes.STRING(500),
         allowNull: true,
       },
-    //   gig_video: {
-    //   type: DataTypes.STRING(500),
-    //   allowNull: true,
-    // },
       city: {
         type: DataTypes.STRING(100),
         allowNull: true,
@@ -76,7 +64,7 @@ const Gig = (sequelize) =>
       status: {
         type: DataTypes.STRING(50),
         allowNull: false,
-        defaultValue: "active",
+        defaultValue: "pending",
       },
     },
     {

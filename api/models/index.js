@@ -17,19 +17,13 @@ import AdminLog from "./adminLog.model.js";
 import SeekerSkill from "./seekerSkill.model.js";
 import GigSkill from "./gigSkills.model.js";
 import GigView from "./gigViews.model.js";
+import GigViewCount from "./gigViewCounts.model.js";
 import UserSearchHistory from "./userSearchHistory.model.js";
 import Notification from "./notification.model.js";
+import CVFile from "./cvFiles.model.js";
 import GigTranslation from "./gigTranslation.model.js";
-import Portfolio from "./portfolio.model.js";
-import GigExtra from "./gigExtra.model.js";
-import GigFaq from "./gigFaq.model.js";
-import GigPackage from "./gigPackage.model.js";
+import GigFaq from "./gigFAQ.model.js";
 import GigRequirements from "./gigRequirement.model.js";
-import OrderExtra from "./orderExtra.model.js";
-import SubCategory from "./subCategory.model.js";
-import Wallet from "./wallet.model.js";
-import WithdrawalRequest from "./withdrawalRequest.model.js";
-import GigRequirementTemplate from "./gigReqTemplate.model.js";
 
 
 export default {
@@ -42,10 +36,6 @@ export default {
   SeekerProfile,
   ExperienceDetail,
   Gig,
-  GigExtra,
-  GigFaq,
-  GigPackage,
-  GigRequirements,
   Order,
   Review,
   Message,
@@ -56,16 +46,14 @@ export default {
   SeekerSkill,
   GigSkill,
   GigView,
+  GigViewCount,
   UserSearchHistory,
   Notification,
-  Portfolio,
+  CVFile,
   GigTranslation,
-  OrderExtra,
-  SubCategory,
-  Wallet,
-  WithdrawalRequest,
-  GigRequirementTemplate
+  GigFaq,
+  GigRequirements,
 };
 
-//index.js, init-db.js, mySQL-db.js dành cho việc khởi tạo database và models của MySQL
+//index.js, init-db.js, mySQL-db.js dành cho việc khởi tạo database và models của MySQL 
 //trong trường hợp không có script của MongoDB và không cài MongoDB => xem file init-db.js

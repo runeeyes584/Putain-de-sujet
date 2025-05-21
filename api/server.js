@@ -13,10 +13,12 @@ import cloudinaryRoute from "./routes/cloudinary.route.js";
 import companyRoute from "./routes/company.route.js";
 import companyImageRoute from "./routes/companyImage.route.js";
 import contactFormRoute from "./routes/contactForm.route.js";
+import cvFilesRoute from "./routes/cvFiles.route.js";
 import experienceDetailRoute from "./routes/experienceDetail.route.js";
 import gigRoute from "./routes/gig.route.js";
 import gigSkillsRoute from "./routes/gigSkills.route.js";
 import gigTranslationRoute from "./routes/gigTranslation.route.js";
+import gigViewCountsRoute from "./routes/gigViewCounts.route.js";
 import gigViewsRoute from "./routes/gigViews.route.js";
 import jobTypeRoute from "./routes/jobType.route.js";
 import messageRoute from "./routes/message.route.js";
@@ -33,18 +35,6 @@ import userRoute from "./routes/user.route.js";
 import userSearchHistoryRoute from "./routes/userSearchHistory.route.js";
 import messageSocketHandler from "./socket/messageSocket.js";
 import dashboardRoute from "./routes/dashboard.route.js";
-
-import gigPackageRoute from "./routes/gigPackage.route.js";
-import gigExtraRoute from "./routes/gigExtra.route.js";
-import gigFAQRoute from "./routes/gigFAQ.route.js";
-import gigRequirementsRoute from "./routes/gigRequirement.route.js";
-import orderExtraRoute from "./routes/orderExtra.route.js";
-import subCategoryRoute from "./routes/subCategory.route.js";
-import walletRoute from "./routes/wallet.route.js";
-import withdrawalRoute from "./routes/withdrawalRequest.route.js";
-import portfolioRoute from "./routes/portfolio.route.js";
-import gigReqTemplateRoute from "./routes/gigReqTemplate.route.js";
-
 // .env
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -84,10 +74,12 @@ app.use("/api/categories", categoryRoute);
 app.use("/api/companies", companyRoute);
 app.use("/api/companyImages", companyImageRoute);
 app.use("/api/contactForms", contactFormRoute);
+app.use("/api/cvFiles", cvFilesRoute);
 app.use("/api/experienceDetails", experienceDetailRoute);
 app.use("/api/gigs", gigRoute);
 app.use("/api/gigSkills", gigSkillsRoute);
 app.use("/api/gigTranslations", gigTranslationRoute);
+app.use("/api/gigViewCounts", gigViewCountsRoute);
 app.use("/api/gigViews", gigViewsRoute);
 app.use("/api/job-types", jobTypeRoute);
 app.use("/api/messages", messageRoute);
@@ -104,22 +96,7 @@ app.use("/api/userSearchHistory", userSearchHistoryRoute);
 app.use("/api/cloudinary", cloudinaryRoute);
 app.use("/api/dashboard", dashboardRoute);
 
-app.use("/api/portfolio", portfolioRoute);
-app.use("/api/subCategories", subCategoryRoute);
-
-app.use("/api/gigPackages", gigPackageRoute);
-app.use("/api/gigExtras", gigExtraRoute);
-app.use("/api/gigFAQs", gigFAQRoute);
-app.use("/api/gigReqTemplates", gigReqTemplateRoute);
-
-
-app.use("/api/orderExtras", orderExtraRoute);
-app.use("/api/gigRequirements", gigRequirementsRoute);
-
-app.use("/api/wallet", walletRoute);
-app.use("/api/withdrawals", withdrawalRoute);
-
-// Error middleware
+// Error middleware (luôn trả về JSON)
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
   const errorMessage = err.message || "Something went wrong!";

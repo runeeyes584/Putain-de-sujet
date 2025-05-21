@@ -56,24 +56,6 @@ export const getGigViewById = async (req, res, next) => {
   }
 };
 
-// Lấy tổng số lượt xem theo gig_id
-export const getGigViewCountsByGigId = async (req, res, next) => {
-  try {
-    const viewCounts = await models.GigView.findAll({
-      attributes: ['gig_id', [models.sequelize.fn('COUNT', models.sequelize.col('*')), 'total_views']],
-      group: ['gig_id'],
-      raw: true, // Trả về dữ liệu dạng plain object
-    });
-    return res.status(200).json({
-      success: true,
-      viewCounts,
-    });
-  } catch (error) {
-    console.error('Error fetching gig view counts:', error.message);
-    return res.status(500).json({ success: false, message: 'Error fetching gig view counts', error: error.message });
-  }
-};
-
 // Xóa lượt xem gig
 export const deleteGigView = async (req, res, next) => {
   try {

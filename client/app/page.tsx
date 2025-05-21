@@ -470,24 +470,10 @@ export default function Home() {
   }, [isSignedIn, user?.id]);
 
   useEffect(() => {
-    const fetchGigs = async () => {
-      try {
-        const response = await fetch("http://localhost:8800/api/gigs");
-        const data = await response.json();
-        if (data && Array.isArray(data.gigs)) {
-          setGigs(data.gigs);
-        } else {
-          setGigs([]);
-        }
-      } catch (error) {
-        console.error("Error fetching gigs:", error);
-        setGigs([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGigs();
+    fetch("http://localhost:8800/api/gigs")
+      .then(res => res.json())
+      .then(data => setGigs(data.gigs))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -501,18 +487,9 @@ export default function Home() {
     return <BannedOverlay />;
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Đang tải dữ liệu...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div>Loading gigs...</div>;
 
-  const serviceCards = gigs ? gigs.map(mapGigToServiceCard) : [];
+  const serviceCards = gigs.map(mapGigToServiceCard);
 
   return (
     <main>
@@ -652,15 +629,9 @@ export default function Home() {
             <div className="container mx-auto px-4">
               <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Recommended for You</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {serviceCards && serviceCards.length > 0 ? (
-                  serviceCards.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    Không có dịch vụ nào được đề xuất
-                  </div>
-                )}
+                {serviceCards.map((service) => (
+                  <ServiceCard key={service.id} service={service} />
+                ))}
               </div>
             </div>
           </section>
@@ -670,15 +641,9 @@ export default function Home() {
             <div className="container mx-auto px-4">
               <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Trending Now</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {serviceCards && serviceCards.length > 0 ? (
-                  serviceCards.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    Không có dịch vụ nào đang thịnh hành
-                  </div>
-                )}
+                {serviceCards.map((service) => (
+                  <ServiceCard key={service.id} service={service} />
+                ))}
               </div>
             </div>
           </section>
@@ -727,19 +692,13 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Popular Services</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {serviceCards && serviceCards.length > 0 ? (
-              serviceCards.map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  showCategory
-                />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                Không có dịch vụ nào được tìm thấy
-              </div>
-            )}
+            {serviceCards.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                showCategory
+              />
+            ))}
           </div>
         </div>
       </section>

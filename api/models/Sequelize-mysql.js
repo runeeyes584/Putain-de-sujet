@@ -15,8 +15,8 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST || "localhost",
   username: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "453145",
-  //password: process.env.DB_PASSWORD || "151004abyss",
-  //password: process.env.DB_PASSWORD || "10022004",
+  password: process.env.DB_PASSWORD || "151004abyss",
+  password: process.env.DB_PASSWORD || "10022004",
   database: process.env.DB_NAME || "fiverr_new",
   port: 3306,
 });
@@ -53,33 +53,9 @@ const defineRelations = (models) => {
   models.Category.hasMany(models.Gig, { foreignKey: 'category_id' });
   models.Gig.belongsTo(models.Category, { foreignKey: 'category_id' });
 
-  // Category-SubCategory: 1-to-many
-  models.Category.hasMany(models.SubCategory, { foreignKey: "category_id" });
-  models.SubCategory.belongsTo(models.Category, { foreignKey: "category_id" });
-
-  // SubCategory-Gig: 1-to-many
-  models.SubCategory.hasMany(models.Gig, { foreignKey: "subcategory_id" });
-  models.Gig.belongsTo(models.SubCategory, { foreignKey: "subcategory_id" });
-
   // JobType-Gig: 1-to-many (one job type can have multiple gigs)
   models.JobType.hasMany(models.Gig, { foreignKey: 'job_type_id' });
   models.Gig.belongsTo(models.JobType, { foreignKey: 'job_type_id' });
-
-  // Gig-GigPackage: 1-to-many (one gig can have multiple packages)
-  models.Gig.hasMany(models.GigPackage, { foreignKey: "gig_id" });
-  models.GigPackage.belongsTo(models.Gig, { foreignKey: "gig_id" });
-
-  // Gig-GigFaq: 1-to-many (one gig can have  have multiple FAQs)
-  models.Gig.hasMany(models.GigFaq, { foreignKey: "gig_id" });
-  models.GigFaq.belongsTo(models.Gig, { foreignKey: "gig_id" });
-
-  // Gig-gigrequirementTemplate: 1-to-many (one gig can have multiple requirement templates)
-  models.Gig.hasMany(models.GigRequirementTemplate, { foreignKey: "gig_id" });
-  models.GigRequirementTemplate.belongsTo(models.Gig, { foreignKey: "gig_id" });
-
-  // Gig-GigExtra: 1-to-many (one gig can have multiple extras)
-  models.Gig.hasMany(models.GigExtra, { foreignKey: "gig_id" });
-  models.GigExtra.belongsTo(models.Gig, { foreignKey: "gig_id" });
 
   // Gig-Order: 1-to-many (one gig can have multiple orders)
   models.Gig.hasMany(models.Order, { foreignKey: 'gig_id' });
@@ -93,27 +69,6 @@ const defineRelations = (models) => {
   models.User.hasMany(models.Order, { foreignKey: 'seller_clerk_id', sourceKey: 'clerk_id', as: 'seller_orders' });
   models.Order.belongsTo(models.User, { foreignKey: 'seller_clerk_id', targetKey: 'clerk_id', as: 'seller' });
 
-  // GigPackage-Order: 1-to-many (one package can be selected in multiple orders)
-  models.GigPackage.hasMany(models.Order, { foreignKey: "package_id" });
-  models.Order.belongsTo(models.GigPackage, { foreignKey: "package_id" });
-
-  // Order-OrderExtras: 1-to-many (one order can have multiple extras)
-  models.Order.hasMany(models.OrderExtra, { foreignKey: "order_id" });
-  models.OrderExtra.belongsTo(models.Order, {
-    foreignKey: "order_id",
-    targetKey: "id",
-  });
-
-  // GigExtra-OrderExtra: 1-to-many (one gig extra can be selected in multiple orders)
-  models.GigExtra.hasMany(models.OrderExtra, { foreignKey: "gig_extra_id" });
-  models.OrderExtra.belongsTo(models.GigExtra, {
-    foreignKey: "gig_extra_id",
-  });
-
-  //order-gigRequirements: 1-to-many (one order can have multiple requirements)
-  models.Order.hasMany(models.GigRequirements, { foreignKey: "order_id" });
-  models.GigRequirements.belongsTo(models.Order, { foreignKey: "order_id" });
-
   // Order-Review: 1-to-1 (one order can have one review)
   models.Order.hasOne(models.Review, { foreignKey: 'order_id' });
   models.Review.belongsTo(models.Order, { foreignKey: 'order_id' });
@@ -125,16 +80,6 @@ const defineRelations = (models) => {
   // User-Review: 1-to-many (one user can write multiple reviews)
   models.User.hasMany(models.Review, { foreignKey: 'reviewer_clerk_id', sourceKey: 'clerk_id' });
   models.Review.belongsTo(models.User, { foreignKey: 'reviewer_clerk_id', targetKey: 'clerk_id' });
-
-   // User-Dispute: 1-to-many (one user can create multiple disputes)
-  // models.User.hasMany(models.Dispute, {
-  //   foreignKey: "clerk_id",
-  //   sourceKey: "clerk_id",
-  // });
-  // models.Dispute.belongsTo(models.User, {
-  //   foreignKey: "clerk_id",
-  //   targetKey: "clerk_id",
-  // });
 
   // Order-Message: 1-to-many (one order can have multiple messages)
   models.Order.hasMany(models.Message, { foreignKey: 'order_id' });
@@ -190,8 +135,8 @@ const defineRelations = (models) => {
   models.GigView.belongsTo(models.User, { foreignKey: 'clerk_id', targetKey: 'clerk_id' });
 
   // Gig-GigViewCount: 1-to-1 (one gig has one view count)
-  // models.Gig.hasOne(models.GigViewCount, { foreignKey: 'gig_id' });
-  // models.GigViewCount.belongsTo(models.Gig, { foreignKey: 'gig_id' });
+  models.Gig.hasOne(models.GigViewCount, { foreignKey: 'gig_id' });
+  models.GigViewCount.belongsTo(models.Gig, { foreignKey: 'gig_id' });
 
   // User-UserSearchHistory: 1-to-many (one user can have multiple search history entries)
   models.User.hasMany(models.UserSearchHistory, { foreignKey: 'clerk_id', sourceKey: 'clerk_id' });
@@ -207,71 +152,35 @@ const defineRelations = (models) => {
   models.Notification.belongsTo(models.User, { foreignKey: 'clerk_id', targetKey: 'clerk_id' });
   models.Notification.belongsTo(models.Gig, { foreignKey: 'gig_id' });
 
-  // User-Portfolio: 1-to-many (one user can upload multiple portfolio files)
-  models.User.hasMany(models.Portfolio, {
-    foreignKey: "clerk_id",
-    sourceKey: "clerk_id",
-  });
-  models.Portfolio.belongsTo(models.User, {
-    foreignKey: "clerk_id",
-    targetKey: "clerk_id",
-  });
+  // User-CVFile: 1-to-many (one user can upload multiple CV files)
+  models.User.hasMany(models.CVFile, { foreignKey: 'clerk_id', sourceKey: 'clerk_id' });
+  models.CVFile.belongsTo(models.User, { foreignKey: 'clerk_id', targetKey: 'clerk_id' });
 
   // Gig-GigTranslation: 1-to-many (one gig can have multiple translations)
   models.Gig.hasMany(models.GigTranslation, { foreignKey: 'gig_id' });
   models.GigTranslation.belongsTo(models.Gig, { foreignKey: 'gig_id' });
 
-  // User-UserWallet: 1-to-many (one user can have multiple wallets for different currencies)
-  models.User.hasMany(models.Wallet, {
-    foreignKey: "clerk_id",
-    sourceKey: "clerk_id",
-  });
-  models.Wallet.belongsTo(models.User, {
-    foreignKey: "clerk_id",
-    targetKey: "clerk_id",
-  });
+  // Gig-GigFaq: 1-to-many (one gig can have multiple FAQs)
+  models.Gig.hasMany(models.GigFaq, { foreignKey: "gig_id" });
+  models.GigFaq.belongsTo(models.Gig, { foreignKey: "gig_id" });
 
-  // User-WithdrawalRequests: 1-to-many (one user can have multiple withdrawal requests)
-  models.User.hasMany(models.WithdrawalRequest, {
-    foreignKey: "clerk_id",
-    sourceKey: "clerk_id",
-  });
-  models.WithdrawalRequest.belongsTo(models.User, {
-    foreignKey: "clerk_id",
-    targetKey: "clerk_id",
-  });
+  // Order-GigRequirements: 1-to-many (one order can have multiple requirements)
+  models.Order.hasMany(models.GigRequirements, { foreignKey: "order_id" });
+  models.GigRequirements.belongsTo(models.Order, { foreignKey: "order_id" });
 
 };
 
 defineRelations(initializedModels);
 
-// Hook for calculating total_price in Order
-initializedModels.Order.beforeCreate(async (order, options) => {
-  try {
-    // Fetch package price
-    const packageData = await initializedModels.GigPackage.findByPk(
-      order.package_id
-    );
-    if (!packageData) {
-      throw new Error("Package not found");
-    }
-    let total_price = packageData.price;
-
-    // Fetch extras price
-    const extras = await initializedModels.OrderExtras.findAll({
-      where: { order_id: order.id },
-    });
-    const extras_price = extras.reduce(
-      (sum, extra) => sum + parseFloat(extra.price),
-      0
-    );
-    total_price += extras_price;
-
-    order.total_price = total_price;
-  } catch (error) {
-    console.error("Error in Order beforeCreate hook:", error);
-    throw error;
-  }
+// Hook cho trigger after_gig_view_insert
+initializedModels.GigView.afterCreate(async (gigView, options) => {
+  await initializedModels.GigViewCount.upsert(
+    {
+      gig_id: gigView.gig_id,
+      total_views: sequelize.literal("total_views + 1"),
+    },
+    { fields: ["total_views"] }
+  );
 });
 
 export { initializedModels as models, sequelize };
