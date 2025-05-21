@@ -38,35 +38,6 @@ function BannedLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// useEffect(() => {
-//     const checkBannedStatus = async () => {
-//       if (!isSignedIn || !user?.id) {
-//         setIsBanned(false);
-//         return;
-//       }
-
-//       try {
-//         const response = await fetch(`http://localhost:8800/api/users/${user.id}`);
-//         if (response.status === 404) {
-//           console.log(`User ${user.id} not found in database. Consider syncing with Clerk.`);
-//           setIsBanned(false);
-//           return;
-//         }
-//         if (!response.ok) throw new Error('Failed to fetch user status');
-//         const data = await response.json();
-//         console.log("[BannedLayout] User data for banned check:", data);
-//         setIsBanned(!!data.is_banned);
-//       } catch (error) {
-//         console.error('Error checking banned status:', error.message);
-//         setIsBanned(false);
-//       }
-//     };
-
-//     checkBannedStatus();
-//   }, [isSignedIn, user?.id]);
-
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
