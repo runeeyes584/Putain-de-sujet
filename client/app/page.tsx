@@ -627,9 +627,16 @@ export default function Home() {
           {/* Recommended for You Section */}
           <section className="bg-gray-50 py-12 dark:bg-gray-900">
             <div className="container mx-auto px-4">
-              <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Recommended for You</h2>
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-3xl font-bold dark:text-white">Recommended for You</h2>
+                <Button variant="ghost" asChild>
+                  <Link href="/search?tab=recommended" className="flex items-center gap-1">
+                    View All <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {serviceCards.map((service) => (
+                {serviceCards.slice(0, 4).map((service) => (
                   <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
@@ -639,9 +646,16 @@ export default function Home() {
           {/* Trending Now Section */}
           <section className="py-12">
             <div className="container mx-auto px-4">
-              <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Trending Now</h2>
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-3xl font-bold dark:text-white">Trending Now</h2>
+                <Button variant="ghost" asChild>
+                  <Link href="/search?tab=trending" className="flex items-center gap-1">
+                    View All <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {serviceCards.map((service) => (
+                {serviceCards.slice(0, 4).map((service) => (
                   <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
@@ -651,16 +665,46 @@ export default function Home() {
           {/* Saved Services Section */}
           <section className="bg-gray-50 py-12 dark:bg-gray-900">
             <div className="container mx-auto px-4">
-              <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Saved Services</h2>
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-3xl font-bold dark:text-white">Saved Services</h2>
+                <Button variant="ghost" asChild>
+                  <Link href="/saved" className="flex items-center gap-1">
+                    View All <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
               {savedGigs.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {savedGigs.map((gig) => (
+                  {savedGigs.slice(0, 4).map((gig) => (
                     <ServiceCard key={gig.id} service={mapGigToServiceCard(gig)} />
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">You don't have any favorite jobs yet.</div>
               )}
+            </div>
+          </section>
+
+          {/* Popular Services Section */}
+          <section className="bg-gray-50 py-16 dark:bg-gray-900">
+            <div className="container mx-auto px-4">
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-3xl font-bold dark:text-white">Popular Services</h2>
+                <Button variant="ghost" asChild>
+                  <Link href="/search?tab=popular" className="flex items-center gap-1">
+                    View All <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {serviceCards.slice(0, 4).map((service) => (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    showCategory
+                  />
+                ))}
+              </div>
             </div>
           </section>
         </>
@@ -682,22 +726,6 @@ export default function Home() {
                 </div>
                 <span className="text-sm font-medium dark:text-white">{category.name}</span>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Services Section */}
-      <section className="bg-gray-50 py-16 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 text-center text-3xl font-bold dark:text-white">Popular Services</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {serviceCards.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                showCategory
-              />
             ))}
           </div>
         </div>

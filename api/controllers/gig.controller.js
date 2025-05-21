@@ -46,6 +46,10 @@ export const getAllGigs = async (req, res, next) => {
       where,
       limit: parseInt(limit),
       offset: parseInt(offset),
+      include: [
+        { model: models.Category, attributes: ['id', 'name'] },
+        { model: models.JobType, attributes: ['id', 'job_type'] }
+      ]
     });
     return res.status(200).json({
       success: true,
