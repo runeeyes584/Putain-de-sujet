@@ -47,10 +47,9 @@ interface PageParams {
   id: string
 }
 
-export default function GigDetailPage({ params }: { params: Promise<PageParams> }) {
-  const resolvedParams = use(params)
+export default function GigDetailPage({ params }: { params: PageParams }) {
+  const gigId = params.id
   const router = useRouter()
-  const gigId = resolvedParams.id
   const { isSaved, isLoading, error, toggleSave } = useSavedGigs(gigId)
   const { user, isSignedIn } = useUser();
   const [reviews, setReviews] = useState<any[]>([]);
@@ -256,7 +255,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
 
   // Handle continue to checkout
   const handleContinue = () => {
-    router.push(`/checkout?gig=${resolvedParams.id}&package=${selectedPackage}`)
+    router.push(`/checkout?gig=${params.id}&package=${selectedPackage}`)
   }
 
   // Handle contact seller
@@ -684,7 +683,7 @@ export default function GigDetailPage({ params }: { params: Promise<PageParams> 
                     </DialogHeader>
                     <ReportModal 
                       type="service"
-                      id={resolvedParams.id}
+                      id={params.id}
                       name={gig.title}
                     />
                   </DialogContent>

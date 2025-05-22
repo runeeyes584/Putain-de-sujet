@@ -420,7 +420,11 @@ export default function ManageGigsPage() {
 
       {/* Modal xem chi tiết gig */}
       <Dialog open={showModal} onOpenChange={handleCloseModal}>
+<<<<<<< HEAD
         <DialogContent className="max-w-lg">
+=======
+        <DialogContent className="max-w-2xl">
+>>>>>>> eccd39d3f559ded6b88d2cb94ed3a7e8883bb50c
           <DialogHeader>
             <DialogTitle>Gig Details</DialogTitle>
             <DialogDescription>
@@ -428,6 +432,7 @@ export default function ManageGigsPage() {
             </DialogDescription>
           </DialogHeader>
           {selectedGig && (
+<<<<<<< HEAD
             <div className="space-y-2">
               <div><b>Tiêu đề:</b> {selectedGig.title}</div>
               <div><b>Mô tả:</b> {selectedGig.description}</div>
@@ -445,6 +450,28 @@ export default function ManageGigsPage() {
                   <img src={selectedGig.gig_image} alt="Gig" className="max-w-full max-h-48 rounded border" />
                 </div>
               )}
+=======
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Info */}
+              <div className="space-y-2">
+                <div><span className="font-semibold">Tiêu đề:</span> {selectedGig.title}</div>
+                <div><span className="font-semibold">Mô tả:</span> {selectedGig.description}</div>
+                <div><span className="font-semibold">Người bán:</span> {selectedGig.seller_clerk_id}</div>
+                <div><span className="font-semibold">Danh mục:</span> {selectedGig.category?.name}</div>
+                <div><span className="font-semibold">Loại công việc:</span> {selectedGig.job_type?.job_type}</div>
+                <div><span className="font-semibold">Giá:</span> <span className="text-emerald-600 font-bold ml-1">${selectedGig.starting_price}</span></div>
+                <div><span className="font-semibold">Thời gian giao:</span> {selectedGig.delivery_time} ngày</div>
+                <div><span className="font-semibold">Vị trí:</span> {selectedGig.city}, {selectedGig.country}</div>
+                <div><span className="font-semibold">Trạng thái:</span> <span className={`ml-1 px-2 py-1 rounded text-white ${selectedGig.status === "pending" ? "bg-yellow-500" : "bg-green-500"}`}>{selectedGig.status}</span></div>
+                <div><span className="font-semibold">Ngày tạo:</span> <span className="ml-1">{selectedGig.created_at ? new Date(selectedGig.created_at).toLocaleString() : "N/A"}</span></div>
+              </div>
+              {/* Image */}
+              <div className="flex flex-col items-center">
+                {selectedGig.gig_image && (
+                  <img src={selectedGig.gig_image} alt="Gig" className="rounded-lg shadow-lg object-cover max-w-[220px] max-h-[220px]" />
+                )}
+              </div>
+>>>>>>> eccd39d3f559ded6b88d2cb94ed3a7e8883bb50c
             </div>
           )}
           <DialogFooter>
